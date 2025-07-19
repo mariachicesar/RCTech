@@ -1,14 +1,30 @@
+import { Database } from './../../database.types';
+import useSWR, { SWRResponse } from "swr";
 
-import useSWR from "swr";
+// Define the type for the user table in the Database
+type UserTable = Database["public"]["Tables"]["user"]["Row"];
 
-
-export const useSearchUser = (searchValue: string) => {
-    const resp = useSWR(searchValue ? `https://ghojojqkptplppuiikqm.supabase.co/rest/v1/user?email=like.${searchValue}*&select=*` : null, {
-        revalidateOnFocus: false,
-    });
-    return {
-        data: resp.data,
-        error: resp.error,
-        isLoading: !resp.error && !resp.data
-    };
+// Define the type for the SWR response data
+interface UseSearchUserResponse {
+    data: UserTable[] | undefined;
+    error: Error | null;
+    isLoading: boolean;
 }
+
+export const useSearchUser = (searchValue: string): UseSearchUserResponse => {
+    // Fetch user data based on the search value
+    const swrResponse: SWRResponse<UserTable[], Error> = useSWR(
+        searchValue
+            ? `https://ghojojqkptplppuiikqm.supabase.co/rest/v1/user?email=like.${searchValue}*&select=*`
+            : null,
+        {
+            revalidateOnFocus: false,
+        }
+    );
+
+    return {
+        data: swrResponse.data,
+        error: swrResponse.error ?? null, // Convert undefined to null
+        isLoading: !swrResponse.error && !swrResponse.data,
+    };
+};

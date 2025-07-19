@@ -10,6 +10,9 @@ import Link from "next/link";
 import React, { useState ,useEffect,useRef} from "react";
 
 const AppHeader = ({  }: { session: Session }) => {
+  // Context
+
+  // State
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isSearchDropdownOpen, setSearchDropdownOpen] = useState(false);
@@ -43,6 +46,12 @@ const AppHeader = ({  }: { session: Session }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+  
+  const onHandleSearchChosen = (email: string) => {
+    setSearchValue(email);
+    setSearchDropdownOpen(false);
+    inputRef.current?.blur();
+  };
 
   const onHandleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -175,6 +184,7 @@ const AppHeader = ({  }: { session: Session }) => {
                   isOpen={isSearchDropdownOpen}
                   onClose={onCloseSearchDropdown}
                   inputRef={inputRef}
+                  onHandleSearchChosen={onHandleSearchChosen}
                 />
               </div>
             </form>
