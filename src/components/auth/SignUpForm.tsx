@@ -4,11 +4,39 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
+import { supabase } from "../../superbase-client";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  
+  // React 19 form action
+  async function signUpAction(formData: FormData) {
+    // This would typically call your signup API
+    const { error } = await supabase.auth.signUp({
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      options: {
+        data: {
+          displayName: `${formData.get('firstName')} ${formData.get('lastName')}` as string,
+        }
+      }
+    });
+    if (error) {
+      console.log("Signup error:", error)
+    }
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(() => {
+      signUpAction(formData);
+    });
+  };
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
@@ -83,7 +111,7 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
@@ -93,8 +121,8 @@ export default function SignUpForm() {
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
+                      id="firstName"
+                      name="firstName"
                       placeholder="Enter your first name"
                     />
                   </div>
@@ -105,8 +133,8 @@ export default function SignUpForm() {
                     </Label>
                     <Input
                       type="text"
-                      id="lname"
-                      name="lname"
+                      id="lastName"
+                      name="lastName"
                       placeholder="Enter your last name"
                     />
                   </div>
@@ -132,6 +160,8 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -165,8 +195,12 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
-                    Sign Up
+                  <button 
+                    type="submit"
+                    disabled={isPending || !isChecked}
+                    className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isPending ? "Signing Up..." : "Sign Up"}
                   </button>
                 </div>
               </div>
