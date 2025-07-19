@@ -8,6 +8,8 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../superbase-client";
 import Button from "../../components/ui/button/Button";
 import { useRouter } from "next/navigation";
+import { SWRConfig } from 'swr'
+import { fetcher } from "../../hooks/fetcher";
 
 export default function AdminLayout({
   children,
@@ -38,24 +40,26 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen xl:flex">
       {session ? (
-        <>
+        <SWRConfig
+          value={{ fetcher }}
+        >
           {/* Sidebar and Backdrop */}
-          <AppSidebar />
-          <Backdrop />
+          <AppSidebar session={session} />
+          <Backdrop session={session} />
           {/* Main Content Area */}
           <div
             className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
           >
             {/* Header */}
-            <AppHeader />
+            <AppHeader session={session} />
             {/* Page Content */}
             <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
           </div>
-        </>
+        </SWRConfig>
       ) : (
         <>
           <div className="flex flex-col items-center justify-center h-screen">
-            <Button className="w-40" size="sm" onClick={() =>router.push("/signin")}>
+            <Button className="w-40" size="sm" onClick={() => router.push("/signin")}>
               Sign in
             </Button>
           </div>
