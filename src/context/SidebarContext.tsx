@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { Database } from "../../database.types";
 
 type SidebarContextType = {
   isExpanded: boolean;
@@ -8,7 +9,7 @@ type SidebarContextType = {
   isHovered: boolean;
   activeItem: string | null;
   openSubmenu: string | null;
-  user: any;
+  user: Database["public"]["Tables"]["user"] | null;
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
   setIsHovered: (isHovered: boolean) => void;
@@ -36,6 +37,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [user, setUser] = useState<Database["public"]["Tables"]["user"] | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -66,9 +68,8 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const setActiveUser = (user: any) => {
-    setActiveItem(user ? user.id : 0);
+  const setActiveUser = (user: Database["public"]["Tables"]["user"] | null) => {
+    setUser(user);
   };
 
   return (
@@ -79,7 +80,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
         isHovered,
         activeItem,
         openSubmenu,
-        user: null, // Placeholder for user data
+        user, // Placeholder for user data
         toggleSidebar,
         toggleMobileSidebar,
         setIsHovered,
