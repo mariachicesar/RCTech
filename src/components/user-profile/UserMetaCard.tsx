@@ -6,12 +6,10 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Image from "next/image";
-import { useSidebar } from "../../context/SidebarContext";
 
 
 export default function UserMetaCard() {
   //Context
-  const { user } = useSidebar();
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here

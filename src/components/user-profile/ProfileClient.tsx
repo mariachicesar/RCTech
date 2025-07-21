@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import UserAddressCard from "./UserAddressCard";
 import UserInfoCard from "./UserInfoCard";
 import UserMetaCard from "./UserMetaCard";
 import Button from "../ui/button/Button";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
-import { supabase } from "../../superbase-client";
 import { useSidebar } from "../../context/SidebarContext";
+import UserBusinessCard from "./UserBusinessCard";
 
 const ProfileClient: React.FC = () => {
     // Context
-    const {user} = useSidebar();
+    const { user } = useSidebar();
 
     // State to manage new user creation form visibility
     const [isNewUser, setIsNewUser] = useState(false);
@@ -20,30 +19,23 @@ const ProfileClient: React.FC = () => {
         firstName: "",
         lastName: "",
         email: "",
-        phone: "",
         businessName: "",
+        address: "",
+        phone: "",
+        rating: 0,
+        review_count: 0,
         oldWebsite: "",
         yelp: "",
         googleMyBusiness: "",
-        otherSites: "",
     });
-    const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+
+    //SWR
+
+
+    const handleSave = () => {
         // Handle save logic here
-        console.log("Saving changes...")
-        const { data, error } = await supabase.rpc('add_user_website', {
-            website: formData.oldWebsite,
-            businessName: formData.businessName,
-            name: formData.firstName + " " + formData.lastName,
-            email: formData.email,
-            role: "client"
-        })
-        if (error) console.error(error)
-        else console.log(data)
+        
     };
-
-
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Handle input change logic here
@@ -138,7 +130,7 @@ const ProfileClient: React.FC = () => {
                                         </div>
 
                                         <div className="col-span-2 lg:col-span-1">
-                                            <Label>Website</Label>
+                                            <Label>Previous/Curent Website</Label>
                                             <Input
                                                 type="text"
                                                 value={formData.oldWebsite}
@@ -168,15 +160,73 @@ const ProfileClient: React.FC = () => {
                                         </div>
 
                                         <div className="col-span-2">
-                                            <Label>Other Sites</Label>
+                                            <Label>Address</Label>
                                             <Input
                                                 type="text"
-                                                value={formData.otherSites}
-                                                name="otherSites"
+                                                value={formData.address}
+                                                name="address"
                                                 onChange={handleChange}
                                             />
                                         </div>
                                     </div>
+                                </div>
+                                {/* Move social links */}
+                                <div>
+                                    <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+                                        Social Links
+                                    </h5>
+
+                                    <div className="w-full grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 xl:grid-cols-4">
+                                        <div>
+                                            <Label>Facebook</Label>
+                                            <Input
+                                                type="text"
+                                                defaultValue="https://www.facebook.com/PimjoHQ"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label>X.com</Label>
+                                            <Input type="text" defaultValue="https://x.com/PimjoHQ" />
+                                        </div>
+
+                                        <div>
+                                            <Label>Linkedin</Label>
+                                            <Input
+                                                type="text"
+                                                defaultValue="https://www.linkedin.com/company/pimjo"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label>Instagram</Label>
+                                            <Input
+                                                type="text"
+                                                defaultValue="https://instagram.com/PimjoHQ"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Rating</Label>
+                                            <Input
+                                                type="text"
+                                                name="rating"
+                                                onChange={handleChange}
+                                                value={formData.rating}
+                                                defaultValue="https://instagram.com/PimjoHQ"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Review Count</Label>
+                                            <Input
+                                                type="text"
+                                                name="reviewCount"
+                                                onChange={handleChange}
+                                                value={formData.review_count}
+                                                defaultValue="https://instagram.com/PimjoHQ"
+                                            />
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
@@ -198,7 +248,7 @@ const ProfileClient: React.FC = () => {
                 <div className="space-y-6">
                     <UserMetaCard />
                     <UserInfoCard user={user} />
-                    <UserAddressCard />
+                    <UserBusinessCard />
                 </div>
             )}
         </div>

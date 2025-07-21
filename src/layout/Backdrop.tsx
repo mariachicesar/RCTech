@@ -1,8 +1,7 @@
 import { useSidebar } from "@/context/SidebarContext";
-import { Session } from "@supabase/supabase-js";
 import React from "react";
 
-const Backdrop = ({ session }: { session: Session }) => {
+const Backdrop = ({ }) => {
   const { isMobileOpen, toggleMobileSidebar } = useSidebar();
 
   if (!isMobileOpen) return null;
