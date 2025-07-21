@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchUser } from "../../hooks/useSearchUser";
-import { useSidebar } from "../../context/SidebarContext";
 
 
 interface SearchResult {
@@ -30,7 +29,6 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   onHandleSearchChosen,
 }) => {
   // Context 
-  const { setActiveUser } = useSidebar();
   const dropdownRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
@@ -38,8 +36,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
 
 
   // Hooks
-  const { data, error, isLoading } = useSearchUser(searchValue);
-  console.log("Search Data:", data, "Error:", error, "Loading:", isLoading);
+  const { data } = useSearchUser(searchValue);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -103,8 +100,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCtaClick = (user: any) => {
     console.log("User clicked:", user);
-    onHandleSearchChosen(user.email);
-    setActiveUser(user);
+    onHandleSearchChosen(user);
     onClose();
   }
   return (

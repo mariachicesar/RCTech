@@ -8,8 +8,13 @@ import Button from "../ui/button/Button";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import { supabase } from "../../superbase-client";
+import { useSidebar } from "../../context/SidebarContext";
 
 const ProfileClient: React.FC = () => {
+    // Context
+    const {user} = useSidebar();
+
+    // State to manage new user creation form visibility
     const [isNewUser, setIsNewUser] = useState(false);
     const [formData, setFormData] = useState({
         firstName: "",
@@ -192,7 +197,7 @@ const ProfileClient: React.FC = () => {
             ) : (
                 <div className="space-y-6">
                     <UserMetaCard />
-                    <UserInfoCard />
+                    <UserInfoCard user={user} />
                     <UserAddressCard />
                 </div>
             )}

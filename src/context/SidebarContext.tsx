@@ -9,7 +9,7 @@ type SidebarContextType = {
   isHovered: boolean;
   activeItem: string | null;
   openSubmenu: string | null;
-  user: Database["public"]["Tables"]["user"] | null;
+  user: Database["public"]["Tables"]["user"]["Row"] | null;
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
   setIsHovered: (isHovered: boolean) => void;
@@ -37,7 +37,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [user, setUser] = useState<Database["public"]["Tables"]["user"] | null>(null);
+  const [user, setUser] = useState<Database["public"]["Tables"]["user"]["Row"] | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -68,7 +68,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
 
-  const setActiveUser = (user: Database["public"]["Tables"]["user"] | null) => {
+  const setActiveUser = (user: Database["public"]["Tables"]["user"]["Row"] | null) => {
     setUser(user);
   };
 

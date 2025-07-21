@@ -106,37 +106,49 @@ export type Database = {
           address: string | null
           business_name: string | null
           created_at: string | null
+          facebook: string | null
           id: number
+          instagram: string | null
           listing_url: string | null
+          other: string | null
           phone: string | null
           platform: string | null
           rating: number | null
           review_count: number | null
           website_id: number | null
+          xUrl: string | null
         }
         Insert: {
           address?: string | null
           business_name?: string | null
           created_at?: string | null
+          facebook?: string | null
           id?: number
+          instagram?: string | null
           listing_url?: string | null
+          other?: string | null
           phone?: string | null
           platform?: string | null
           rating?: number | null
           review_count?: number | null
           website_id?: number | null
+          xUrl?: string | null
         }
         Update: {
           address?: string | null
           business_name?: string | null
           created_at?: string | null
+          facebook?: string | null
           id?: number
+          instagram?: string | null
           listing_url?: string | null
+          other?: string | null
           phone?: string | null
           platform?: string | null
           rating?: number | null
           review_count?: number | null
           website_id?: number | null
+          xUrl?: string | null
         }
         Relationships: [
           {
@@ -517,6 +529,7 @@ export type Database = {
           id: number
           name: string | null
           password: string | null
+          phone: string | null
           role: string | null
           users_id: string | null
           website_id: number | null
@@ -527,6 +540,7 @@ export type Database = {
           id?: number
           name?: string | null
           password?: string | null
+          phone?: string | null
           role?: string | null
           users_id?: string | null
           website_id?: number | null
@@ -537,6 +551,7 @@ export type Database = {
           id?: number
           name?: string | null
           password?: string | null
+          phone?: string | null
           role?: string | null
           users_id?: string | null
           website_id?: number | null
