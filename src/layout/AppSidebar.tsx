@@ -18,7 +18,6 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
-import { Session } from "@supabase/supabase-js";
 
 type NavItem = {
   name: string;
@@ -95,7 +94,7 @@ const othersItems: NavItem[] = [
   },
 ];
 
-const AppSidebar = ({ session }: { session: Session }) => {
+const AppSidebar = ({  }) => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 

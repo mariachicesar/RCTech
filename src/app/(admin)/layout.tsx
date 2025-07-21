@@ -44,8 +44,8 @@ export default function AdminLayout({
           value={{ fetcher }}
         >
           {/* Sidebar and Backdrop */}
-          <AppSidebar session={session} />
-          <Backdrop session={session} />
+          <AppSidebar />
+          <Backdrop  />
           {/* Main Content Area */}
           <div
             className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}

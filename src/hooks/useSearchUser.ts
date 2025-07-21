@@ -2,7 +2,7 @@ import { Database } from './../../database.types';
 import useSWR, { SWRResponse } from "swr";
 
 // Define the type for the user table in the Database
-type UserTable = Database["public"]["Tables"]["user"]["Row"];
+export type UserTable = Database["public"]["Tables"]["user"]["Row"];
 
 // Define the type for the SWR response data
 interface UseSearchUserResponse {

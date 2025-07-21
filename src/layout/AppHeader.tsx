@@ -8,16 +8,28 @@ import { Session } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState ,useEffect,useRef} from "react";
+import { UserTable } from "../hooks/useSearchUser";
+import { useUser } from "../hooks/useUser";
 
 const AppHeader = ({  }: { session: Session }) => {
   // Context
+    const { isMobileOpen, toggleSidebar, toggleMobileSidebar, setActiveUser } = useSidebar();
 
   // State
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isSearchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  //SWR Hooks
+  const { user } = useUser(userId);
+
+  useEffect(()=>{
+    if (Array.isArray(user) && user[0]) {
+      setActiveUser(user[0])
+    }
+  }, [user, setActiveUser])
+
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
@@ -46,9 +58,10 @@ const AppHeader = ({  }: { session: Session }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-  
-  const onHandleSearchChosen = (email: string) => {
-    setSearchValue(email);
+
+  const onHandleSearchChosen = (user: UserTable) => {
+    setSearchValue(user.email ?? "");
+    setUserId(user.id);
     setSearchDropdownOpen(false);
     inputRef.current?.blur();
   };

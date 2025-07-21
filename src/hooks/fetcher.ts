@@ -18,5 +18,7 @@ export const fetcher = async <T>(url: string, method: string, token: string, pay
         throw new Error('Network response was not ok');
     }
 
-    return await res.json();
+    // Check if the response body is empty
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
 };
