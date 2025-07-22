@@ -8,6 +8,8 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import { useSidebar } from "../../context/SidebarContext";
 import UserBusinessCard from "./UserBusinessCard";
+import { mutate } from "swr";
+import { mutateUpdate } from "../../hooks/useMutateUpdate";
 
 const ProfileClient: React.FC = () => {
     // Context
@@ -16,24 +18,73 @@ const ProfileClient: React.FC = () => {
     // State to manage new user creation form visibility
     const [isNewUser, setIsNewUser] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
+        firstName: user?.name ? user.name.split(" ")[0] : "",
+        lastName: user?.name ? user.name.split(" ")[1] : "",
+        email: user?.email || "",
         businessName: "",
-        address: "",
-        phone: "",
+        address:  "",
+        phone:  "",
         rating: 0,
-        review_count: 0,
+        reviewCount: 0,
         oldWebsite: "",
         yelp: "",
         googleMyBusiness: "",
+        facebook: "",
+        x: "",
+        instagram: "",
     });
 
     //SWR
+    // 1. Insert Website get last id
+    // 2. Update User table 
+    // 3. Insert Business Listing Table
+    
 
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // Handle save logic here
+        const result = await mutateUpdate({
+            path: "/website",
+            method: "POST",
+            payload: {
+                name: formData.businessName,
+            },
+            additionalHeaders: {
+                Prefer: "return=representation",
+            },
+        })
+        if(result.error) {
+            console.error("Error saving user data:", result.error);
+            return
+        }
+        const websiteId: number = (result.response as { id: number }[])[0].id;
+        mutateUpdate({
+            path: `/user?id=eq.${user?.id}`,
+            method: "PATCH",
+            payload: {
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                website_id: websiteId,
+                phone: formData.phone,
+            },
+        });
+        mutateUpdate({
+            path: `/business_listing`,
+            method: user?.website_id ? "PATCH" : "POST",
+            payload: {
+                listing_url: formData.oldWebsite,
+                business_name: formData.businessName,
+                address: formData.address,
+                rating: formData.rating,
+                review_count: formData.reviewCount,
+                website_id: websiteId,
+                xUrl: formData.x,
+                instagram: formData.instagram,
+                facebook: formData.facebook,
+
+            },
+        });
+        mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`);
         
     };
 
@@ -113,6 +164,7 @@ const ProfileClient: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div className="mt-7">
                                     <h5 className="mb-5 text-lg font-medium text-gray-800 lg:mb-6 dark:text-white/90">
                                         Business Information
@@ -181,28 +233,24 @@ const ProfileClient: React.FC = () => {
                                             <Label>Facebook</Label>
                                             <Input
                                                 type="text"
-                                                defaultValue="https://www.facebook.com/PimjoHQ"
+                                                name="facebook"
+                                                onChange={handleChange}
+                                                value={formData.facebook}
                                             />
                                         </div>
-
                                         <div>
                                             <Label>X.com</Label>
-                                            <Input type="text" defaultValue="https://x.com/PimjoHQ" />
+                                            <Input type="text"
+                                            name="x" onChange={handleChange} value={formData.x} />
+                                        
                                         </div>
-
-                                        <div>
-                                            <Label>Linkedin</Label>
-                                            <Input
-                                                type="text"
-                                                defaultValue="https://www.linkedin.com/company/pimjo"
-                                            />
-                                        </div>
-
                                         <div>
                                             <Label>Instagram</Label>
                                             <Input
                                                 type="text"
-                                                defaultValue="https://instagram.com/PimjoHQ"
+                                                name="instagram"
+                                                onChange={handleChange}
+                                                value={formData.instagram}
                                             />
                                         </div>
                                         <div>
@@ -212,7 +260,6 @@ const ProfileClient: React.FC = () => {
                                                 name="rating"
                                                 onChange={handleChange}
                                                 value={formData.rating}
-                                                defaultValue="https://instagram.com/PimjoHQ"
                                             />
                                         </div>
                                         <div>
@@ -221,8 +268,7 @@ const ProfileClient: React.FC = () => {
                                                 type="text"
                                                 name="reviewCount"
                                                 onChange={handleChange}
-                                                value={formData.review_count}
-                                                defaultValue="https://instagram.com/PimjoHQ"
+                                                value={formData.reviewCount}
                                             />
                                         </div>
                                     </div>
@@ -248,7 +294,10 @@ const ProfileClient: React.FC = () => {
                 <div className="space-y-6">
                     <UserMetaCard />
                     <UserInfoCard user={user} />
-                    <UserBusinessCard />
+                    {user?.website_id === null ? <Button variant="outline" onClick={() => setIsNewUser(true)}>
+                        Complete Business Info
+                    </Button> : <UserBusinessCard />}
+                    
                 </div>
             )}
         </div>

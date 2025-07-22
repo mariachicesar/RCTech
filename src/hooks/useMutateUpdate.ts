@@ -8,6 +8,7 @@ type UpdateType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any;
     mutateKey?: string;
+    additionalHeaders?: Record<string, string>;
 }
 
 type UseMutateUpdateResponse = {
@@ -15,10 +16,10 @@ type UseMutateUpdateResponse = {
     error: unknown | null;
 };
 
-export async function mutateUpdate({ path, method, payload, mutateKey }: UpdateType): Promise<UseMutateUpdateResponse> {
+export async function mutateUpdate({ path, method, mutateKey, payload, additionalHeaders }: UpdateType): Promise<UseMutateUpdateResponse> {
     const fullPath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1${path}`;
     try {
-        const res = await fetcher(fullPath, method, process.env.NEXT_PUBLIC_SUPABASE_KEY as string, payload);
+        const res = await fetcher(fullPath, method, process.env.NEXT_PUBLIC_SUPABASE_KEY as string, payload, additionalHeaders);
         if (mutateKey) {
             void mutate(mutateKey);
         }
