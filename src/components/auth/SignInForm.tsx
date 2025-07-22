@@ -14,9 +14,8 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     // Handle form submission logic here
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -29,7 +28,7 @@ export default function SignInForm() {
     if (error) {
       console.error("Error signing in:", error.message);
     } else {
-      router.push("/"); 
+      router.push("/");
     }
   };
 
@@ -152,7 +151,7 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
+                  <Button className="w-full" size="sm" type="submit">
                     Sign in
                   </Button>
                 </div>
