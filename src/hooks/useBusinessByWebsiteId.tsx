@@ -7,9 +7,9 @@ import { Database } from "../../database.types";
 export type BusinessListingRow = Database["public"]["Tables"]["business_listing"]["Row"];
 
 export const useBusinessByWebsiteId = (websiteId: number | null): {
-    business: BusinessListingRow;
+    business: BusinessListingRow | null;
     isLoading: boolean;
-    error: Error;
+    error: Error | undefined;
 } => {
     const res: SWRResponse = useSWR(
         websiteId ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${websiteId}` : null,
@@ -19,7 +19,7 @@ export const useBusinessByWebsiteId = (websiteId: number | null): {
     );
 
     return {
-        business: res.data[0],
+        business: res?.data ? res.data[0] : null,
         isLoading: !res.error && !res.data,
         error: res.error,
     };

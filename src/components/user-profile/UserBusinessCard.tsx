@@ -1,32 +1,58 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
-import { BusinessListingRow } from "../../hooks/useBusinessByWebsiteId";
+import { useBusinessByWebsiteId } from "../../hooks/useBusinessByWebsiteId";
 import { mutateUpdate } from "../../hooks/useMutateUpdate";
 import { useSidebar } from "../../context/SidebarContext";
+import { mutate } from "swr";
 
-interface UserBusinessCardProps {
-  business: BusinessListingRow
-}
 
-export default function UserBusinessCard({ business }: UserBusinessCardProps) {
-  //Context
-  const { user } = useSidebar()
+export default function UserBusinessCard() {
+  // Context
+  const { user } = useSidebar();
+  // SWR
+  const { business } = useBusinessByWebsiteId(user?.website_id ?? null);
   // Modal state
   const { isOpen, openModal, closeModal } = useModal();
+  
   const [formData, setFormData] = useState({
-    name: business.business_name,
-    address: business.address,
-    rating: business.rating,
-    reviewCount: business.review_count,
-    xUrl: business.xUrl,
-    instagram: business.instagram,
-    facebook: business.facebook,
+    name: "",
+    address: "",
+    rating: 0,
+    reviewCount: 0,
+    xUrl: "",
+    instagram: "",
+    facebook: "",
   });
+
+  useEffect(() => {
+    if (business) {
+      setFormData({
+        name: business.business_name || "",
+        address: business.address || "",
+        rating: business.rating || 0,
+        reviewCount: business.review_count || 0,
+        xUrl: business.xUrl || "",
+        instagram: business.instagram || "",
+        facebook: business.facebook || "",
+      });
+    } else {
+      setFormData({
+        name: "",
+        address: "",
+        rating: 0,
+        reviewCount: 0,
+        xUrl: "",
+        instagram: "",
+        facebook: "",
+      });
+    }
+  }, [business]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -34,24 +60,46 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
       [name]: value,
     }));
   };
-  const handleSave = () => {
-    // Handle save logic here
-    const payload = {
-      business_name: formData.name,
-      address: formData.address,
-      rating: formData.rating,
-      review_count: formData.reviewCount,
-      xUrl: formData.xUrl,
-      instagram: formData.instagram,
-      facebook: formData.facebook,
-    };
-    mutateUpdate({
-      path: business.id ? `/business_listing?website_id=eq.${user?.website_id}` : null,
-      method: "PATCH",
-      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
-      payload: payload,
-    });
+  const handleSave = async () => {
+    if (!user?.website_id) {
+        const result = await mutateUpdate({
+            path: "/website",
+            method: "POST",
+            payload: {
+                name: formData.name,
+            },
+            additionalHeaders: {
+                Prefer: "return=representation",
+            },
+        })
+        if (result.error) {
+            console.error("Error saving user data:", result.error);
+            return
+        }
+        const websiteId: number = (result.response as { id: number }[])[0].id;
+        mutateUpdate({
+            path: `/user?id=eq.${user?.id}`,
+            method: "PATCH",
+            payload: {
+                website_id: websiteId,
+            },
+        });
+    }
+        mutateUpdate({
+            path: `/business_listing`,
+            method: user?.website_id ? "PATCH" : "POST",
+            payload: {
+                business_name: formData.name,
+                address: formData.address,
+                rating: formData.rating,
+                review_count: formData.reviewCount,
+                xUrl: formData.xUrl,
+                instagram: formData.instagram,
+                facebook: formData.facebook,
 
+            },
+        });
+        mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`);
     closeModal();
   };
   return (
@@ -69,7 +117,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Name
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.business_name}
+                  {formData.name}
                 </p>
               </div>
 
@@ -78,7 +126,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Address
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.address}
+                  {formData.address}
                 </p>
               </div>
 
@@ -87,7 +135,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Rating
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.rating}
+                  {formData.rating}
                 </p>
               </div>
 
@@ -96,7 +144,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Number of Reviews
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.review_count}
+                  {formData.reviewCount}
                 </p>
               </div>
               <div>
@@ -113,7 +161,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   X
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.xUrl}
+                  {formData.xUrl}
                 </p>
               </div>
               <div>
@@ -121,7 +169,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Instagram
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.instagram}
+                  {formData.instagram}
                 </p>
               </div>
               <div>
@@ -129,7 +177,7 @@ export default function UserBusinessCard({ business }: UserBusinessCardProps) {
                   Facebook
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {business.facebook}
+                  {formData.facebook}
                 </p>
               </div>
             </div>
