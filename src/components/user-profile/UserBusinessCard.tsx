@@ -1,16 +1,57 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { BusinessListingRow } from "../../hooks/useBusinessByWebsiteId";
+import { mutateUpdate } from "../../hooks/useMutateUpdate";
+import { useSidebar } from "../../context/SidebarContext";
 
-export default function UserBusinessCard() {
+interface UserBusinessCardProps {
+  business: BusinessListingRow
+}
+
+export default function UserBusinessCard({ business }: UserBusinessCardProps) {
+  //Context
+  const { user } = useSidebar()
+  // Modal state
   const { isOpen, openModal, closeModal } = useModal();
+  const [formData, setFormData] = useState({
+    name: business.business_name,
+    address: business.address,
+    rating: business.rating,
+    reviewCount: business.review_count,
+    xUrl: business.xUrl,
+    instagram: business.instagram,
+    facebook: business.facebook,
+  });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   const handleSave = () => {
     // Handle save logic here
-    console.log("Saving changes...");
+    const payload = {
+      business_name: formData.name,
+      address: formData.address,
+      rating: formData.rating,
+      review_count: formData.reviewCount,
+      xUrl: formData.xUrl,
+      instagram: formData.instagram,
+      facebook: formData.facebook,
+    };
+    mutateUpdate({
+      path: business.id ? `/business_listing?website_id=eq.${user?.website_id}` : null,
+      method: "PATCH",
+      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
+      payload: payload,
+    });
+
     closeModal();
   };
   return (
@@ -19,43 +60,76 @@ export default function UserBusinessCard() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-              Address
+              Business Information
             </h4>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Country
+                  Name
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States
+                  {business.business_name}
                 </p>
               </div>
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  City/State
+                  Address
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona, United States.
+                  {business.address}
                 </p>
               </div>
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Postal Code
+                  Rating
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  ERT 2489
+                  {business.rating}
                 </p>
               </div>
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  TAX ID
+                  Number of Reviews
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  AS4568384
+                  {business.review_count}
+                </p>
+              </div>
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  Website
+                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  TODO
+                </p>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  X
+                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  {business.xUrl}
+                </p>
+              </div>
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  Instagram
+                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  {business.instagram}
+                </p>
+              </div>
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  Facebook
+                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  {business.facebook}
                 </p>
               </div>
             </div>
@@ -98,23 +172,35 @@ export default function UserBusinessCard() {
             <div className="px-2 overflow-y-auto custom-scrollbar">
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
-                  <Label>Country</Label>
-                  <Input type="text" defaultValue="United States" />
+                  <Label>Business Name</Label>
+                  <Input type="text" name="name" value={formData.name ?? ""} onChange={handleChange} />
                 </div>
 
                 <div>
-                  <Label>City/State</Label>
-                  <Input type="text" defaultValue="Arizona, United States." />
+                  <Label>Address</Label>
+                  <Input type="text" name="address" value={formData.address ?? ""} onChange={handleChange} />
                 </div>
 
                 <div>
-                  <Label>Postal Code</Label>
-                  <Input type="text" defaultValue="ERT 2489" />
+                  <Label>Rating</Label>
+                  <Input type="text" name="rating" value={formData.rating ?? ""} onChange={handleChange} />
                 </div>
 
                 <div>
-                  <Label>TAX ID</Label>
-                  <Input type="text" defaultValue="AS4568384" />
+                  <Label>Amount of Reviews</Label>
+                  <Input type="text" name="reviewCount" value={formData.reviewCount ?? ""} onChange={handleChange} />
+                </div>
+                <div>
+                  <Label>X</Label>
+                  <Input type="text" name="x" value={formData.xUrl ?? ""} onChange={handleChange} />
+                </div>
+                <div>
+                  <Label>Instagram</Label>
+                  <Input type="text" name="instagram" value={formData.instagram ?? ""} onChange={handleChange} />
+                </div>
+                <div>
+                  <Label>Facebook</Label>
+                  <Input type="text" name="facebook" value={formData.facebook ?? ""} onChange={handleChange} />
                 </div>
               </div>
             </div>

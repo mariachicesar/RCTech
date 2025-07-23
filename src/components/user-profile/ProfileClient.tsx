@@ -10,6 +10,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import UserBusinessCard from "./UserBusinessCard";
 import { mutate } from "swr";
 import { mutateUpdate } from "../../hooks/useMutateUpdate";
+import { useBusinessByWebsiteId } from "../../hooks/useBusinessByWebsiteId";
 
 const ProfileClient: React.FC = () => {
     // Context
@@ -33,14 +34,12 @@ const ProfileClient: React.FC = () => {
         x: "",
         instagram: "",
     });
-
     //SWR
+    const {business} = useBusinessByWebsiteId(user?.website_id || null);
     // 1. Insert Website get last id
     // 2. Update User table 
     // 3. Insert Business Listing Table
-    
-
-
+    // 4. TODO: Create New User it only handles Update User
     const handleSave = async () => {
         // Handle save logic here
         const result = await mutateUpdate({
@@ -95,6 +94,7 @@ const ProfileClient: React.FC = () => {
             [e.target.name]: e.target.value,
         });
     };
+
 
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
@@ -296,7 +296,7 @@ const ProfileClient: React.FC = () => {
                     <UserInfoCard user={user} />
                     {user?.website_id === null ? <Button variant="outline" onClick={() => setIsNewUser(true)}>
                         Complete Business Info
-                    </Button> : <UserBusinessCard />}
+                    </Button> : <UserBusinessCard business={business} />}
                     
                 </div>
             )}
