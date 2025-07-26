@@ -1,6 +1,6 @@
 import { Outfit } from 'next/font/google';
 import './globals.css';
-
+import '@mdxeditor/editor/style.css'
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 
