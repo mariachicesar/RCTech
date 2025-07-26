@@ -10,6 +10,7 @@ import Button from "../../components/ui/button/Button";
 import { useRouter } from "next/navigation";
 import { SWRConfig } from 'swr'
 import { fetcher } from "../../hooks/fetcher";
+import '@mdxeditor/editor/style.css'
 
 export default function AdminLayout({
   children,
