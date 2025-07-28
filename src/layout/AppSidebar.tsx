@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
   {
     name: "Forms",
     icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }, { name: "Main Forms", path: "/form-main", pro: false }],
+    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }, { name: "Main Pages", path: "/main-page", pro: false }],
   },
   {
     name: "Tables",

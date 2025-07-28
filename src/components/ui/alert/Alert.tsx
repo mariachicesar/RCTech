@@ -1,5 +1,6 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 interface AlertProps {
   variant: "success" | "error" | "warning" | "info"; // Alert type
@@ -8,6 +9,8 @@ interface AlertProps {
   showLink?: boolean; // Whether to show the "Learn More" link
   linkHref?: string; // Link URL
   linkText?: string; // Link text
+  timeout?: number; // Auto-hide timeout in milliseconds (default: 5000)
+  onClose?: () => void; // Callback when alert is closed
 }
 
 const Alert: React.FC<AlertProps> = ({
@@ -17,7 +20,24 @@ const Alert: React.FC<AlertProps> = ({
   showLink = false,
   linkHref = "#",
   linkText = "Learn more",
+  timeout = 5000,
+  onClose,
 }) => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (timeout > 0) {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        onClose?.();
+      }, timeout);
+
+      return () => clearTimeout(timer);
+    }
+  }, [timeout, onClose]);
+
+  if (!isVisible) return null;
+
   // Tailwind classes for each variant
   const variantClasses = {
     success: {
@@ -114,28 +134,55 @@ const Alert: React.FC<AlertProps> = ({
 
   return (
     <div
-      className={`rounded-xl border p-4 ${variantClasses[variant].container}`}
+      className={`rounded-xl border p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'} ${variantClasses[variant].container}`}
     >
       <div className="flex items-start gap-3">
         <div className={`-mt-0.5 ${variantClasses[variant].icon}`}>
           {icons[variant]}
         </div>
 
-        <div>
-          <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
-            {title}
-          </h4>
+        <div className="flex-1">
+          <div className="flex items-start justify-between">
+            <div>
+              <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
+                {title}
+              </h4>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
 
-          {showLink && (
-            <Link
-              href={linkHref}
-              className="inline-block mt-3 text-sm font-medium text-gray-500 underline dark:text-gray-400"
+              {showLink && (
+                <Link
+                  href={linkHref}
+                  className="inline-block mt-3 text-sm font-medium text-gray-500 underline dark:text-gray-400"
+                >
+                  {linkText}
+                </Link>
+              )}
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setIsVisible(false);
+                onClose?.();
+              }}
+              className="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
-              {linkText}
-            </Link>
-          )}
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
