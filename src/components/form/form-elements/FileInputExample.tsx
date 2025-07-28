@@ -7,6 +7,7 @@ import Label from "../Label";
 import { imageCompressor } from '@mbs-dev/react-image-compressor';
 import * as piexifjs from 'piexifjs';
 import { useS3Upload } from "next-s3-upload";
+import Input from "../input/InputField";
 
 
 export default function FileInputExample() {
@@ -16,6 +17,14 @@ export default function FileInputExample() {
   const [uploadedUrl, setUploadedUrl] = useState<string>('');
   const [uploading, setUploading] = useState(false);
   const { uploadToS3 } = useS3Upload();
+    const [formData, setFormData] = useState({
+    latitude: '',
+    longitude: ''
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+  };
 
   // Function to convert image to JPEG if needed
   const convertToJpeg = (file: File): Promise<File> => {
@@ -112,6 +121,33 @@ export default function FileInputExample() {
     });
   };
 
+  // Function to compress image progressively until under 1MB (accounting for EXIF overhead)
+  const compressImageUnder1MB = async (file: File): Promise<File> => {
+    const targetSize = 100 * 1024; // 100KB in bytes
+    const exifOverhead = 50 * 1024; // Reserve ~50KB for EXIF data
+    const compressionTarget = targetSize - exifOverhead; // Target smaller size to account for EXIF
+    
+  let quality = 0.8;
+  let compressed: File = await imageCompressor(file, quality) as File;
+  
+  // If already under target, return as is
+  if (compressed.size <= compressionTarget) {
+    return compressed;
+  }
+  
+  // Progressive compression with more aggressive steps for large files
+  while (compressed.size > compressionTarget && quality > 0.1) {
+    // Use larger quality steps for files significantly over target
+    const sizeRatio = compressed.size / compressionTarget;
+    const qualityStep = sizeRatio > 2 ? 0.2 : 0.1;
+    
+    quality = Math.max(0.1, quality - qualityStep);
+    compressed = await imageCompressor(file, quality) as File;
+  }
+  
+  return compressed;
+  };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -119,29 +155,19 @@ export default function FileInputExample() {
       setImageFile(file);
       setUploading(true);
       
-      // Compress the image
-      const quality = 0.8;
       try {
-        const compressed = await imageCompressor(file, quality);
-        setCompressedFile(compressed as File);
+        // Compress the image to under 1MB
+        const compressed = await compressImageUnder1MB(file);
+        setCompressedFile(compressed);
         
-        // Add geolocation EXIF data (example coordinates: New York City)
-        const latitude = 40.7128;
-        const longitude = -74.0060;
-        const fileWithGeo = await addGeolocationExif(compressed as File, latitude, longitude);
+        // Add geolocation EXIF data (example coordinates: Los Angeles)
+        const latitude = formData.latitude ? parseFloat(formData.latitude) : 34.0522; // Default to LA if not provided
+        const longitude = formData.longitude ? parseFloat(formData.longitude) : -118.2437; // Default to LA if not provided
+        const fileWithGeo = await addGeolocationExif(compressed, latitude, longitude);
         setFileWithExif(fileWithGeo);
         
         // Upload to S3
-        const { url } = await uploadToS3(fileWithGeo, {
-          endpoint: {
-            request: {
-              url: '/api/s3-upload',
-              body: {
-                bucket: 'techconsulting-rc'
-              }
-            }
-          }
-        });
+        const { url } = await uploadToS3(fileWithGeo);
 
         setUploadedUrl(url);
         console.log("Image compressed, EXIF data added, and uploaded successfully to:", url);
@@ -153,11 +179,37 @@ export default function FileInputExample() {
     }
   };
 
+
+
   return (
     <ComponentCard title="File Input">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+            <div>
+              <Label>Latitude</Label>
+              <Input
+                type="text"
+                name="latitude"
+                placeholder="ex. 40.7128"
+                required={true}
+                value={formData.latitude}
+                onChange={(e) => handleInputChange("latitude", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Longitude</Label>
+              <Input
+                type="text"
+                name="longitude"
+                placeholder="ex. -74.0060"
+                required={true}
+                value={formData.longitude}
+                onChange={(e) => handleInputChange("longitude", e.target.value)}
+              />
+            </div>
+          </div>
       <div>
         <Label>Upload file</Label>
-        <FileInput onChange={handleFileChange} className="custom-class" />
+        <FileInput onChange={handleFileChange} className="custom-class"/>
         {uploading && <p>Processing and uploading...</p>}
         {imageFile && <p>Original file: {imageFile.name} ({(imageFile.size / 1024).toFixed(2)} KB)</p>}
         {compressedFile && <p>Compressed file: {compressedFile.name} ({(compressedFile.size / 1024).toFixed(2)} KB)</p>}

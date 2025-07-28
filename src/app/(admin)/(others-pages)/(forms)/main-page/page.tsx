@@ -243,34 +243,6 @@ export default function FormMain() {
           </div>
         </div>
         <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-            <div>
-              <Label>Seo-Title</Label>
-              <Input
-                type="text"
-                name="seo-title"
-                placeholder="ex. Car Wrap "
-                required={true}
-                value={formData.seoTitle}
-                onChange={(e) => handleInputChange("seoTitle", e.target.value)}
-                className={errors.seoTitle ? "border-red-500" : ""}
-              />
-              {errors.seoTitle && <p className="text-red-500 text-sm mt-1">{errors.seoTitle}</p>}
-            </div>
-            <div>
-              <Label>Seo-Title</Label>
-              <Input
-                type="text"
-                name="seo-title"
-                placeholder="ex. Car Wrap "
-                required={true}
-                value={formData.seoTitle}
-                onChange={(e) => handleInputChange("seoTitle", e.target.value)}
-                className={errors.seoTitle ? "border-red-500" : ""}
-              />
-              {errors.seoTitle && <p className="text-red-500 text-sm mt-1">{errors.seoTitle}</p>}
-            </div>
-          </div>
           <FileInputExample />
           <DropzoneComponent />
         </div>
