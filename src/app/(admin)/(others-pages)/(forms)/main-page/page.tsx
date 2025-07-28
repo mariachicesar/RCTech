@@ -1,8 +1,7 @@
 "use client";
 
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import DropzoneComponent from "@/components/form/form-elements/DropZone";
-import FileInputExample from "@/components/form/form-elements/FileInputExample";
+import MultipleFileInputExample from "@/components/form/form-elements/MultipleFileInputExample";
 import dynamic from "next/dynamic";
 import React, { Suspense, useRef, useState } from "react";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
@@ -11,9 +10,11 @@ import Label from "../../../../../components/form/Label";
 import Select from "../../../../../components/form/Select";
 import ComponentCard from "../../../../../components/common/ComponentCard";
 import { ChevronDownIcon } from "../../../../../icons";
-import Input from "../../../../../components/form/input/InputField";
 import Button from "../../../../../components/ui/button/Button";
-import TextArea from "../../../../../components/form/input/TextArea";
+import SeoMetadata from "../../../../../components/form/form-elements/SeoMetadata";
+import { useSidebar } from "../../../../../context/SidebarContext";
+import { mutateUpdate } from "../../../../../hooks/useMutateUpdate";
+import Alert from "../../../../../components/ui/alert/Alert";
 
 const Editor = dynamic(() => import("@/components/mdxEditor/Editor"), {
   ssr: false,
@@ -27,8 +28,11 @@ Give me content using SEO best practices. For company [Name] for the service []
 `;
 
 export default function FormMain() {
+  //Context
+  const { user } = useSidebar();
   //State
   const [newPage, setNewPage] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [formData, setFormData] = useState({
     seoTitle: "",
     seoKeywords: "",
@@ -44,6 +48,10 @@ export default function FormMain() {
     slug: "",
   });
   const [content, setContent] = useState("");
+  const [imageUploadLocation, setImageUploadLocation] = useState<{ table: string; id: number }>({ table: "", id: 0 });
+  const [resetTrigger, setResetTrigger] = useState(0);
+
+  //Hooks
 
 
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -97,12 +105,63 @@ export default function FormMain() {
     editorRef.current?.focus();
   };
 
-  const handleSavePage = () => {
+
+  const handleSavePage = async () => {
     const keys = Object.keys(formData) as Array<keyof typeof formData>;
     const isValid = keys.every((key) => validateField(key, formData[key]));
-    if (isValid) {
-      // Save logic here
-      console.log("Page saved successfully", formData, content);
+    const isContentValid = content.trim().length > 0;
+    if (isValid && isContentValid) {
+      const pagePayload = {
+        title: formData.title,
+        slug: formData.slug,
+        content: content,
+        website_id: user?.website_id,
+      }
+      const result = await mutateUpdate({
+        path: "/page",
+        method: "POST",
+        payload: pagePayload,
+        additionalHeaders: {
+          Prefer: "return=representation",
+        },
+      })
+      if (result) {
+        const pageId = (result.response as { id: number }[])[0].id;
+        mutateUpdate({
+          path: "/seo_metadata",
+          method: "POST",
+          payload: {
+            meta_title: formData.seoTitle,
+            meta_description: formData.seoDescription,
+            keywords: formData.seoKeywords,
+            page_id: pageId,
+          },
+        })
+        setImageUploadLocation({
+          table: "/page_image",
+          id: pageId,
+        })
+
+        // Clear all state and show success alert
+        setFormData({
+          seoTitle: "",
+          seoKeywords: "",
+          seoDescription: "",
+          title: "",
+          slug: "",
+        });
+        setContent("");
+        setNewPage(false);
+        setShowAlert(true);
+        setResetTrigger(prev => prev + 1); // Trigger reset
+
+        // Reset editor content
+        if (editorRef.current) {
+          editorRef.current.setMarkdown(markdown);
+        }
+      }
+
+
     } else {
       console.error("Form validation failed", errors);
     }
@@ -120,6 +179,17 @@ export default function FormMain() {
 
   return (
     <div>
+      {showAlert && (
+        <div className="mb-4">
+          <Alert
+            variant="success"
+            title="Insert was successful"
+            message="Your changes have been saved."
+            timeout={5000}
+            onClose={() => setShowAlert(false)}
+          />
+        </div>
+      )}
       <PageBreadcrumb pageTitle="Main Forms" />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-6">
@@ -133,76 +203,7 @@ export default function FormMain() {
                 {newPage ? "Cancel" : "New Page"}
               </Button>
               {newPage && (
-                <form className="flex flex-col">
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div>
-                      <Label>Seo-Title</Label>
-                      <Input
-                        type="text"
-                        name="seo-title"
-                        placeholder="ex. Car Wrap "
-                        required={true}
-                        value={formData.seoTitle}
-                        onChange={(e) => handleInputChange("seoTitle", e.target.value)}
-                        className={errors.seoTitle ? "border-red-500" : ""}
-                      />
-                      {errors.seoTitle && <p className="text-red-500 text-sm mt-1">{errors.seoTitle}</p>}
-                    </div>
-                    <div>
-                      <Label>Seo-Keywords</Label>
-                      <Input
-                        type="text"
-                        name="seo-keywords"
-                        placeholder="ex. car, wrap, service"
-                        required={true}
-                        value={formData.seoKeywords}
-                        onChange={(e) => handleInputChange("seoKeywords", e.target.value)}
-                        className={errors.seoKeywords ? "border-red-500" : ""}
-                      />
-                      {errors.seoKeywords && <p className="text-red-500 text-sm mt-1">{errors.seoKeywords}</p>}
-                    </div>
-                    {/* Default TextArea */}
-                    <div>
-                      <Label>Seo-Description</Label>
-                      <TextArea
-                        value={formData.seoDescription}
-                        onChange={handleDescriptionChange}
-                        rows={6}
-                        required={true}
-                        className={errors.seoDescription ? "border-red-500" : ""}
-                      />
-                      {errors.seoDescription && <p className="text-red-500 text-sm mt-1">{errors.seoDescription}</p>}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div>
-                      <Label>Title</Label>
-                      <Input
-                        type="text"
-                        name="title"
-                        placeholder="ex. Car Wrap"
-                        required={true}
-                        value={formData.title}
-                        onChange={(e) => handleInputChange("title", e.target.value)}
-                        className={errors.title ? "border-red-500" : ""}
-                      />
-                      {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
-                    </div>
-                    <div>
-                      <Label>Slug</Label>
-                      <Input
-                        type="text"
-                        name="slug"
-                        placeholder="ex. car-wrap"
-                        required={true}
-                        value={formData.slug}
-                        onChange={(e) => handleInputChange("slug", e.target.value)}
-                        className={errors.slug ? "border-red-500" : ""}
-                      />
-                      {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug}</p>}
-                    </div>
-                  </div>
-                </form>
+                <SeoMetadata formData={formData} handleInputChange={handleInputChange} errors={errors} handleDescriptionChange={handleDescriptionChange} />
               )}
               <div>
                 <Label>Select Input & Edit</Label>
@@ -243,11 +244,13 @@ export default function FormMain() {
           </div>
         </div>
         <div className="space-y-6">
-          <FileInputExample />
-          <DropzoneComponent />
+          <MultipleFileInputExample
+            imageUploadLocation={imageUploadLocation}
+            resetTrigger={resetTrigger}
+          />
         </div>
         {newPage && (
-          <Button size="sm" className="bg-green-500" onClick={handleSavePage}>
+          <Button size="sm" className="bg-green-500" onClick={handleSavePage} disabled={user?.id === 0}>
             Save Page
           </Button>
         )}
@@ -255,3 +258,4 @@ export default function FormMain() {
     </div>
   );
 }
+
