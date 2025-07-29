@@ -180,7 +180,7 @@ export default function FormMain() {
   return (
     <div>
       {showAlert && (
-        <div className="mb-4">
+        <div className="fixed top-4 right-4 z-50">
           <Alert
             variant="success"
             title="Insert was successful"

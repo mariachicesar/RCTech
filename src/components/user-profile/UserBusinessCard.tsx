@@ -18,7 +18,7 @@ export default function UserBusinessCard() {
   const { business } = useBusinessByWebsiteId(user?.website_id ?? null);
   // Modal state
   const { isOpen, openModal, closeModal } = useModal();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -62,44 +62,62 @@ export default function UserBusinessCard() {
   };
   const handleSave = async () => {
     if (!user?.website_id) {
-        const result = await mutateUpdate({
-            path: "/website",
-            method: "POST",
-            payload: {
-                name: formData.name,
-            },
-            additionalHeaders: {
-                Prefer: "return=representation",
-            },
-        })
-        if (result.error) {
-            console.error("Error saving user data:", result.error);
-            return
-        }
-        const websiteId: number = (result.response as { id: number }[])[0].id;
-        mutateUpdate({
-            path: `/user?id=eq.${user?.id}`,
-            method: "PATCH",
-            payload: {
-                website_id: websiteId,
-            },
-        });
+      const result = await mutateUpdate({
+        path: "/website",
+        method: "POST",
+        payload: {
+          name: formData.name,
+        },
+        additionalHeaders: {
+          Prefer: "return=representation",
+        },
+      })
+      if (result.error) {
+        console.error("Error saving user data:", result.error);
+        return
+      }
+      const websiteId: number = (result.response as { id: number }[])[0].id;
+      mutateUpdate({
+        path: `/user?id=eq.${user?.id}`,
+        method: "PATCH",
+        payload: {
+          website_id: websiteId,
+        },
+      });
+      mutateUpdate({
+        path: `/business_listing`,
+        method: "POST",
+        mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
+        payload: {
+          business_name: formData.name,
+          address: formData.address,
+          rating: formData.rating,
+          review_count: formData.reviewCount,
+          xUrl: formData.xUrl,
+          instagram: formData.instagram,
+          facebook: formData.facebook,
+          website_id: websiteId,
+        },
+      });
     }
-        mutateUpdate({
-            path: `/business_listing`,
-            method: user?.website_id ? "PATCH" : "POST",
-            payload: {
-                business_name: formData.name,
-                address: formData.address,
-                rating: formData.rating,
-                review_count: formData.reviewCount,
-                xUrl: formData.xUrl,
-                instagram: formData.instagram,
-                facebook: formData.facebook,
-
-            },
-        });
-        mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`);
+    if(user?.website_id) {
+    mutateUpdate({
+      path: `/business_listing?website_id=eq.${user?.website_id}`,
+      method: "PATCH",
+      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
+      payload: {
+        business_name: formData.name,
+        address: formData.address,
+        rating: formData.rating,
+        review_count: formData.reviewCount,
+        xUrl: formData.xUrl,
+        instagram: formData.instagram,
+        facebook: formData.facebook,
+        website_id: user?.website_id,
+      },
+    });
+  }
+    mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`);
     closeModal();
   };
   return (
@@ -240,7 +258,7 @@ export default function UserBusinessCard() {
                 </div>
                 <div>
                   <Label>X</Label>
-                  <Input type="text" name="x" value={formData.xUrl ?? ""} onChange={handleChange} />
+                  <Input type="text" name="xUrl" value={formData.xUrl ?? ""} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Instagram</Label>

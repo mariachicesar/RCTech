@@ -6,13 +6,14 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState, useTransition } from "react";
 import { supabase } from "../../superbase-client";
+import Alert from "../ui/alert/Alert";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isPending, startTransition] = useTransition();
-  
-  // React 19 form action
+  const [showAlert, setShowAlert] = useState(false);
+
   async function signUpAction(formData: FormData) {
     // This would typically call your signup API
     const { error } = await supabase.auth.signUp({
@@ -25,8 +26,10 @@ export default function SignUpForm() {
       }
     });
     if (error) {
-      console.log("Signup error:", error)
+      console.log("Signup error:", error);
+      return;
     }
+    setShowAlert(true);
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -195,7 +198,7 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <button 
+                  <button
                     type="submit"
                     disabled={isPending || !isChecked}
                     className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -220,6 +223,17 @@ export default function SignUpForm() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="mb-4">
+          <Alert
+            variant="info"
+            title="Check your email"
+            message="A verification link has been sent to your email address."
+            timeout={5000}
+            onClose={() => setShowAlert(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
