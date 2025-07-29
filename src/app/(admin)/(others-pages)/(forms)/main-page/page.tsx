@@ -15,7 +15,8 @@ import SeoMetadata from "../../../../../components/form/form-elements/SeoMetadat
 import { useSidebar } from "../../../../../context/SidebarContext";
 import { mutateUpdate } from "../../../../../hooks/useMutateUpdate";
 import Alert from "../../../../../components/ui/alert/Alert";
-import { useGetPages } from "../../../../../hooks/useGetPages";
+import { useGetPages } from "../../../../../hooks/usePages";
+import { useGetSeo } from "../../../../../hooks/useSeo";
 
 const Editor = dynamic(() => import("@/components/mdxEditor/Editor"), {
   ssr: false,
@@ -51,13 +52,34 @@ export default function FormMain() {
   const [content, setContent] = useState("");
   const [imageUploadLocation, setImageUploadLocation] = useState<{ table: string; id: number }>({ table: "", id: 0 });
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [selectedPage, setSelectedPage] = useState<
+    | {
+      content: string | null;
+      created_at: string | null;
+      id: number;
+      slug: string | null;
+      title: string | null;
+      type: string | null;
+      website_id: number | null;
+    }
+    | undefined
+  >(undefined);
 
   //Hooks
-  const {pages} = useGetPages(user?.website_id || null);
+  const { pages } = useGetPages(user?.website_id || null);
+  const { seoData } = useGetSeo(selectedPage?.id || null);
+
 
   useEffect(() => {
-    console.log("Pages updated:", pages);
-  }, [pages]);
+    setFormData({
+      seoTitle: seoData?.meta_title || "",
+      seoKeywords: seoData?.keywords || "",
+      seoDescription: seoData?.meta_description || "",
+      title: selectedPage?.title || "",
+      slug: selectedPage?.slug || "",
+    });
+    console.log("SEO Data updated:", seoData);
+  }, [seoData]);
 
   const editorRef = useRef<MDXEditorMethods>(null);
 
@@ -172,14 +194,14 @@ export default function FormMain() {
     }
   }
 
-  const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
-  ];
+  const pagesOptions = pages.map((page) => ({
+    value: page.id,
+    label: page.slug || "",
+  }));
 
-  const handleSelectChange = (value: string) => {
-    console.log("Selected value:", value);
+  const handleSelectChange = (value: string | number) => {
+    setSelectedPage(pages.find((page) => page.id === Number(value)))
+
   };
 
   return (
@@ -211,7 +233,7 @@ export default function FormMain() {
                 <Label>Select Input & Edit</Label>
                 <div className="relative">
                   <Select
-                    options={options}
+                    options={pagesOptions}
                     placeholder="Select Option"
                     onChange={handleSelectChange}
                     className="dark:bg-dark-900"
@@ -224,36 +246,47 @@ export default function FormMain() {
               {newPage && (
                 <SeoMetadata formData={formData} handleInputChange={handleInputChange} errors={errors} handleDescriptionChange={handleDescriptionChange} />
               )}
+              {seoData && (
+                <SeoMetadata formData={formData} handleInputChange={handleInputChange} errors={errors} handleDescriptionChange={handleDescriptionChange} />
+              )}
             </div>
           </ComponentCard>
-          <div className="rounded-lg border bg-white p-6 shadow-sm">
-            <div className="border rounded-lg overflow-hidden">
-              <Suspense fallback={null}>
-                <Editor editorRef={editorRef} markdown={markdown} />
-              </Suspense>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                onClick={handleGetMarkdown}
-                className="rounded bg-purple-500 px-3 py-2 text-sm text-white hover:bg-purple-600"
-              >
-                Get Markdown
-              </button>
-              <button
-                onClick={handleFocusEditor}
-                className="rounded bg-gray-500 px-3 py-2 text-sm text-white hover:bg-gray-600"
-              >
-                Focus Editor
-              </button>
-            </div>
-          </div>
         </div>
-        <div className="space-y-6">
-          <MultipleFileInputExample
-            imageUploadLocation={imageUploadLocation}
-            resetTrigger={resetTrigger}
-          />
-        </div>
+        {selectedPage ? <div className="border rounded-lg overflow-hidden">
+          <Suspense fallback={null}>
+            <Editor editorRef={editorRef} markdown={selectedPage.content || ""} />
+          </Suspense>
+        </div> : (
+          <>
+            <div className="rounded-lg border bg-white p-6 shadow-sm">
+              <div className="border rounded-lg overflow-hidden">
+                <Suspense fallback={null}>
+                  <Editor editorRef={editorRef} markdown={markdown} />
+                </Suspense>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={handleGetMarkdown}
+                  className="rounded bg-purple-500 px-3 py-2 text-sm text-white hover:bg-purple-600"
+                >
+                  Get Markdown
+                </button>
+                <button
+                  onClick={handleFocusEditor}
+                  className="rounded bg-gray-500 px-3 py-2 text-sm text-white hover:bg-gray-600"
+                >
+                  Focus Editor
+                </button>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <MultipleFileInputExample
+                imageUploadLocation={imageUploadLocation}
+                resetTrigger={resetTrigger}
+              />
+            </div>
+          </>
+        )}
         {newPage && (
           <Button size="sm" className="bg-green-500" onClick={handleSavePage} disabled={user?.id === 0}>
             Save Page

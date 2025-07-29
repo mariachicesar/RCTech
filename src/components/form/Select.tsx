@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 interface Option {
-  value: string;
+  value: string | number;
   label: string;
 }
 
@@ -41,8 +41,7 @@ const Select: React.FC<SelectProps> = ({
     >
       {/* Placeholder option */}
       <option
-        value=""
-        disabled
+        value={undefined}
         className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
       >
         {placeholder}
