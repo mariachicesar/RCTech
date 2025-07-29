@@ -3,7 +3,7 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import MultipleFileInputExample from "@/components/form/form-elements/MultipleFileInputExample";
 import dynamic from "next/dynamic";
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import Label from "../../../../../components/form/Label";
@@ -15,6 +15,7 @@ import SeoMetadata from "../../../../../components/form/form-elements/SeoMetadat
 import { useSidebar } from "../../../../../context/SidebarContext";
 import { mutateUpdate } from "../../../../../hooks/useMutateUpdate";
 import Alert from "../../../../../components/ui/alert/Alert";
+import { useGetPages } from "../../../../../hooks/useGetPages";
 
 const Editor = dynamic(() => import("@/components/mdxEditor/Editor"), {
   ssr: false,
@@ -52,7 +53,11 @@ export default function FormMain() {
   const [resetTrigger, setResetTrigger] = useState(0);
 
   //Hooks
+  const {pages} = useGetPages(user?.website_id || null);
 
+  useEffect(() => {
+    console.log("Pages updated:", pages);
+  }, [pages]);
 
   const editorRef = useRef<MDXEditorMethods>(null);
 
@@ -202,10 +207,7 @@ export default function FormMain() {
               >
                 {newPage ? "Cancel" : "New Page"}
               </Button>
-              {newPage && (
-                <SeoMetadata formData={formData} handleInputChange={handleInputChange} errors={errors} handleDescriptionChange={handleDescriptionChange} />
-              )}
-              <div>
+              <div className={`${!newPage ? "" : "hidden"}`}>
                 <Label>Select Input & Edit</Label>
                 <div className="relative">
                   <Select
@@ -219,6 +221,9 @@ export default function FormMain() {
                   </span>
                 </div>
               </div>
+              {newPage && (
+                <SeoMetadata formData={formData} handleInputChange={handleInputChange} errors={errors} handleDescriptionChange={handleDescriptionChange} />
+              )}
             </div>
           </ComponentCard>
           <div className="rounded-lg border bg-white p-6 shadow-sm">
