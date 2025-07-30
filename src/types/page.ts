@@ -14,6 +14,8 @@ export interface FormData {
   seoDescription: string;
   title: string;
   slug: string;
+  altText?: string; // Optional for image metadata
+  caption?: string; // Optional for image metadata
 }
 
 export interface FormErrors {

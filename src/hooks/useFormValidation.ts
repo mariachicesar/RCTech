@@ -28,7 +28,7 @@ export const useFormValidation = () => {
       case "seoTitle":
         if (!value.trim()) error = "SEO Title is required";
         else if (value.length < 10) error = "SEO Title must be at least 10 characters";
-        else if (value.length > 60) error = "SEO Title must be less than 60 characters";
+        else if (value.length > 80) error = "SEO Title must be less than 60 characters";
         break;
       case "seoKeywords":
         if (!value.trim()) error = "SEO Keywords are required";
@@ -36,12 +36,12 @@ export const useFormValidation = () => {
         break;
       case "seoDescription":
         if (!value.trim()) error = "SEO Description is required";
-        else if (value.length < 120) error = "SEO Description must be at least 120 characters";
-        else if (value.length > 160) error = "SEO Description must be less than 160 characters";
+        else if (value.length < 110) error = "SEO Description must be at least 110 characters";
+        else if (value.length > 180) error = "SEO Description must be less than 180 characters";
         break;
       case "title":
         if (!value.trim()) error = "Title is required";
-        else if (value.length < 60) error = "Title must be at least 60 characters";
+        else if (value.length < 70) error = "Title must be at least 70 characters";
         break;
       case "slug":
         if (!value.trim()) error = "Slug is required";
@@ -60,7 +60,7 @@ export const useFormValidation = () => {
 
   const validateAllFields = useCallback((): boolean => {
     const keys = Object.keys(formData) as Array<keyof FormData>;
-    return keys.every((key) => validateField(key, formData[key]));
+    return keys.every((key) => validateField(key, formData[key] ?? ""));
   }, [formData, validateField]);
 
   const resetForm = useCallback(() => {
