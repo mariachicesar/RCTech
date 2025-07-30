@@ -65,7 +65,7 @@ export const usePageManager = ({ websiteId, onSuccess }: UsePageManagerProps) =>
     }
 
     return null;
-  }, [content, websiteId, onSuccess]);
+  }, [content, onSuccess]);
 
   const resetPageState = useCallback(() => {
     setContent("");

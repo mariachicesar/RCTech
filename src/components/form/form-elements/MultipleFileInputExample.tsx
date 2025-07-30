@@ -182,7 +182,7 @@ export default function MultipleFileInputExample({
 
   // Function to compress image progressively until under target size
   const compressImageUnder1MB = async (file: File): Promise<File> => {
-    const targetSize = 100 * 1024; // 100KB in bytes
+    const targetSize = 500 * 1024; // 500KB in bytes
     const exifOverhead = 50 * 1024; // Reserve ~50KB for EXIF data
     const compressionTarget = targetSize - exifOverhead;
 

@@ -109,7 +109,7 @@ export default function FormMain() {
     } else {
       console.error("Form validation failed", errors);
     }
-  }, [validateAllFields, content, savePage, formData, errors]);
+  }, [validateAllFields, content, savePage, formData, user?.website_id, errors]);
 
   const shouldShowSeoMetadata = newPage || !!seoData;
   const editorMarkdown = selectedPage?.content || DEFAULT_MARKDOWN;
