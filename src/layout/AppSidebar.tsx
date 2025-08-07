@@ -8,6 +8,7 @@ import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
+  FileIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -16,6 +17,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  VideoIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -42,11 +44,20 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
-
+    {
+    name: "Prompts",
+    icon: <FileIcon />,
+    subItems: [{ name: "Chat GPT", path: "/chat-gpt", pro: false }],
+  },
   {
     name: "Forms",
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }, { name: "Main Pages", path: "/main-page", pro: false }],
+  },
+    {
+    icon: <VideoIcon />,
+    name: "Assets",
+    path: "/assets",
   },
   {
     name: "Tables",

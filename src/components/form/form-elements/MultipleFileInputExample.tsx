@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import Image from "next/image";
 import ComponentCard from "../../common/ComponentCard";
 import FileInput from "../input/FileInput";
@@ -22,13 +22,19 @@ interface ImageData {
   uploading: boolean;
 }
 
-export default function MultipleFileInputExample({
-  imageUploadLocation,
-  resetTrigger
-}: {
+export interface MultipleFileInputRef {
+  handleSaveImages: () => Promise<void>;
+}
+
+export default forwardRef<MultipleFileInputRef, {
   imageUploadLocation: { table: string; id: number };
   resetTrigger?: number;
-}) {
+  idFieldName?: string;
+}>(function MultipleFileInputExample({
+  imageUploadLocation,
+  resetTrigger,
+  idFieldName = 'page_id'
+}, ref) {
   const [formData, setFormData] = useState({
     latitude: '',
     longitude: ''
@@ -66,7 +72,7 @@ export default function MultipleFileInputExample({
     if (response && Array.isArray(response.response)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const payload = response.response.map((img: any) => ({
-        page_id: imageUploadLocation.id,
+        [idFieldName]: imageUploadLocation.id,
         image_id: img.id,
       }));
 
@@ -79,12 +85,11 @@ export default function MultipleFileInputExample({
     }
 
 
-  }, [images, imageUploadLocation]);
+  }, [images, imageUploadLocation, idFieldName]);
 
-  useEffect(() => {
-    handleSaveImages();
-  }, [imageUploadLocation, handleSaveImages]);
-
+  useImperativeHandle(ref, () => ({
+    handleSaveImages
+  }), [handleSaveImages]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -363,4 +368,4 @@ export default function MultipleFileInputExample({
       </div>
     </ComponentCard>
   );
-}
+});
