@@ -13,9 +13,9 @@ import { mutate } from "swr";
 
 export default function UserBusinessCard() {
   // Context
-  const { user } = useSidebar();
+  const { selectedClient } = useSidebar();
   // SWR
-  const { business } = useBusinessByWebsiteId(user?.website_id ?? null);
+  const { business } = useBusinessByWebsiteId(selectedClient?.website_id ?? null);
   // Modal state
   const { isOpen, openModal, closeModal } = useModal();
 
@@ -61,7 +61,7 @@ export default function UserBusinessCard() {
     }));
   };
   const handleSave = async () => {
-    if (!user?.website_id) {
+    if (!selectedClient?.website_id) {
       const result = await mutateUpdate({
         path: "/website",
         method: "POST",
@@ -78,7 +78,7 @@ export default function UserBusinessCard() {
       }
       const websiteId: number = (result.response as { id: number }[])[0].id;
       mutateUpdate({
-        path: `/user?id=eq.${user?.id}`,
+        path: `/user?id=eq.${selectedClient?.id}`,
         method: "PATCH",
         payload: {
           website_id: websiteId,
@@ -87,7 +87,7 @@ export default function UserBusinessCard() {
       mutateUpdate({
         path: `/business_listing`,
         method: "POST",
-        mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
+        mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${selectedClient?.website_id}`,
         payload: {
           business_name: formData.name,
           address: formData.address,
@@ -100,11 +100,11 @@ export default function UserBusinessCard() {
         },
       });
     }
-    if(user?.website_id) {
+    if(selectedClient?.website_id) {
     mutateUpdate({
-      path: `/business_listing?website_id=eq.${user?.website_id}`,
+      path: `/business_listing?website_id=eq.${selectedClient?.website_id}`,
       method: "PATCH",
-      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${user?.website_id}`,
+      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${selectedClient?.website_id}`,
       payload: {
         business_name: formData.name,
         address: formData.address,
@@ -113,11 +113,11 @@ export default function UserBusinessCard() {
         xUrl: formData.xUrl,
         instagram: formData.instagram,
         facebook: formData.facebook,
-        website_id: user?.website_id,
+        website_id: selectedClient?.website_id,
       },
     });
   }
-    mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`);
+    mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${selectedClient?.id}`);
     closeModal();
   };
   return (

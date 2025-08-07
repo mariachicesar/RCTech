@@ -10,12 +10,14 @@ type SidebarContextType = {
   activeItem: string | null;
   openSubmenu: string | null;
   user: Database["public"]["Tables"]["user"]["Row"] | null;
+  selectedClient: any | null;
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
   setIsHovered: (isHovered: boolean) => void;
   setActiveItem: (item: string | null) => void;
   toggleSubmenu: (item: string) => void;
-  setActiveUser: (user: any) => void;
+  setSelectedClient: (client: any) => void;
+  setActiveUser: (user: any | null) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -38,6 +40,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [user, setUser] = useState<Database["public"]["Tables"]["user"]["Row"] | null>(null);
+  const [selectedClient, setClient] = useState<any>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -68,6 +71,10 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
 
+  const setSelectedClient = (client: any | null) => {
+    setClient(client);
+  };
+
   const setActiveUser = (user: Database["public"]["Tables"]["user"]["Row"] | null) => {
     setUser(user);
   };
@@ -81,11 +88,13 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
         activeItem,
         openSubmenu,
         user, // Placeholder for user data
+        selectedClient,
         toggleSidebar,
         toggleMobileSidebar,
         setIsHovered,
         setActiveItem,
         toggleSubmenu,
+        setSelectedClient,
         setActiveUser,
       }}
     >

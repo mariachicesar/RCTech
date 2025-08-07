@@ -11,19 +11,19 @@ import Image from "next/image";
 
 
 export default function AssetsPage() {
-    const { user } = useSidebar();
+    const { selectedClient } = useSidebar();
     const [isNewAsset, setIsNewAsset] = useState(false);
     const [imageUploadLocation, setImageUploadLocation] = useState<ImageUploadLocation>({ table: "", id: 0, idFieldName: "" });
     const fileInputRef = useRef<MultipleFileInputRef>(null);
 
     //SWR
-    const { assets, isLoading, error } = useGetAssets(user?.website_id || null);
+    const { assets, isLoading, error } = useGetAssets(selectedClient?.website_id || null);
 
     const resetTrigger = 0; // This can be used to reset the file input if needed
 
     const handleSave = () => {
         // Set the upload location first
-        setImageUploadLocation({ table: "/asset", id: user?.website_id || 0, idFieldName: "website_id" });
+        setImageUploadLocation({ table: "/asset", id: selectedClient?.website_id || 0, idFieldName: "website_id" });
     };
 
     useEffect(() => {
