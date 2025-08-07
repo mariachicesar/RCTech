@@ -34,4 +34,5 @@ export interface SelectOption {
 export interface ImageUploadLocation {
   table: string;
   id: number;
+  idFieldName?: string; // Optional, used for specific cases like page images
 }

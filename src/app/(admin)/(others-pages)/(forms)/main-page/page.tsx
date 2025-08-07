@@ -181,6 +181,7 @@ export default function FormMain() {
               <MultipleFileInputExample
                 imageUploadLocation={imageUploadLocation}
                 resetTrigger={resetTrigger}
+                idFieldName="page_id"
               />
             </div>
           </>

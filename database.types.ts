@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset: {
+        Row: {
+          created_at: string
+          id: number
+          image_id: number | null
+          website_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          image_id?: number | null
+          website_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          image_id?: number | null
+          website_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_image_id_fkey"
+            columns: ["image_id"]
+            isOneToOne: false
+            referencedRelation: "image"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "website"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_post: {
         Row: {
           author_id: number | null
@@ -107,7 +143,9 @@ export type Database = {
           business_name: string | null
           created_at: string | null
           facebook: string | null
+          gmb_Id: string | null
           id: number
+          industry: string | null
           instagram: string | null
           listing_url: string | null
           other: string | null
@@ -123,7 +161,9 @@ export type Database = {
           business_name?: string | null
           created_at?: string | null
           facebook?: string | null
+          gmb_Id?: string | null
           id?: number
+          industry?: string | null
           instagram?: string | null
           listing_url?: string | null
           other?: string | null
@@ -139,7 +179,9 @@ export type Database = {
           business_name?: string | null
           created_at?: string | null
           facebook?: string | null
+          gmb_Id?: string | null
           id?: number
+          industry?: string | null
           instagram?: string | null
           listing_url?: string | null
           other?: string | null
@@ -153,6 +195,54 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "business_listing_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "website"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      detail_slug: {
+        Row: {
+          auth_id: number | null
+          content: string | null
+          created_at: string
+          id: number
+          slug: string | null
+          title: string | null
+          updated_at: string | null
+          website_id: number | null
+        }
+        Insert: {
+          auth_id?: number | null
+          content?: string | null
+          created_at?: string
+          id?: number
+          slug?: string | null
+          title?: string | null
+          updated_at?: string | null
+          website_id?: number | null
+        }
+        Update: {
+          auth_id?: number | null
+          content?: string | null
+          created_at?: string
+          id?: number
+          slug?: string | null
+          title?: string | null
+          updated_at?: string | null
+          website_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detail_slug_auth_id_fkey"
+            columns: ["auth_id"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detail_slug_website_id_fkey"
             columns: ["website_id"]
             isOneToOne: false
             referencedRelation: "website"
@@ -183,6 +273,38 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
+      }
+      location_local: {
+        Row: {
+          cities: Json | null
+          created_at: string
+          id: number
+          website_id: number | null
+          zip: Json | null
+        }
+        Insert: {
+          cities?: Json | null
+          created_at?: string
+          id?: number
+          website_id?: number | null
+          zip?: Json | null
+        }
+        Update: {
+          cities?: Json | null
+          created_at?: string
+          id?: number
+          website_id?: number | null
+          zip?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_local_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "website"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       page: {
         Row: {
@@ -227,21 +349,18 @@ export type Database = {
           created_at: string | null
           id: number
           image_id: number | null
-          order: number | null
           page_id: number | null
         }
         Insert: {
           created_at?: string | null
           id?: number
           image_id?: number | null
-          order?: number | null
           page_id?: number | null
         }
         Update: {
           created_at?: string | null
           id?: number
           image_id?: number | null
-          order?: number | null
           page_id?: number | null
         }
         Relationships: [
