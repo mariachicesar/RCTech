@@ -1,0 +1,35 @@
+// This file contains the Prisma schema for the application.
+
+// ...existing models...
+
+model GoogleTokens {
+  id           String   @id @default(cuid())
+  userId       String
+  clientId     String
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Business @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clientId])
+  @@map("google_tokens")
+}
+
+// Add to your existing User model
+model User {
+  // ...existing fields...
+  googleTokens GoogleTokens[]
+}
+
+// Add to your existing Business model
+model Business {
+  // ...existing fields...
+  gmb_connected    Boolean?      @default(false)
+  gmb_connected_at DateTime?
+  googleTokens     GoogleTokens[]
+}
