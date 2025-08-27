@@ -26,7 +26,7 @@ Give me content using SEO best practices. For company [Name] for the service []
 
 export default function FormMain() {
   // Context
-  const { user } = useSidebar();
+  const { selectedClient } = useSidebar();
   
   // State
   const [newPage, setNewPage] = useState(false);
@@ -50,7 +50,7 @@ export default function FormMain() {
     savePage, 
     resetPageState 
   } = usePageManager({
-    websiteId: user?.website_id || null,
+    websiteId: selectedClient?.website_id || null,
     onSuccess: handleSaveSuccess,
   });
 
@@ -105,11 +105,11 @@ export default function FormMain() {
     const isContentValid = content.trim().length > 0;
     
     if (isValid && isContentValid) {
-      await savePage(formData, user?.website_id);
+      await savePage(formData, selectedClient?.website_id);
     } else {
       console.error("Form validation failed", errors);
     }
-  }, [validateAllFields, content, savePage, formData, user?.website_id, errors]);
+  }, [validateAllFields, content, savePage, formData, selectedClient?.website_id, errors]);
 
   const shouldShowSeoMetadata = newPage || !!seoData;
   const editorMarkdown = selectedPage?.content || DEFAULT_MARKDOWN;
@@ -192,7 +192,7 @@ export default function FormMain() {
             size="sm" 
             className="bg-green-500" 
             onClick={handleSavePage} 
-            disabled={user?.id === 0}
+            disabled={selectedClient?.id === 0}
           >
             Save Page
           </Button>

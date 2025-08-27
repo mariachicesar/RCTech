@@ -54,6 +54,11 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }, { name: "Main Pages", path: "/main-page", pro: false }],
   },
+  {
+    name: "Google Business",
+    icon: <PlugInIcon />,
+    path: "/google-business",
+  },
     {
     icon: <VideoIcon />,
     name: "Assets",

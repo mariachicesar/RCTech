@@ -20,7 +20,7 @@ export const useBusinessByWebsiteId = (websiteId: number | null): {
 
     return {
         business: res?.data ? res.data[0] : null,
-        isLoading: !res.error && !res.data,
+        isLoading: websiteId ? !res.error && !res.data : false,
         error: res.error,
     };
 }

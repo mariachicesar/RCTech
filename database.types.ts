@@ -250,6 +250,85 @@ export type Database = {
           },
         ]
       }
+      gmb_posts: {
+        Row: {
+          client_id: number | null
+          created_at: string | null
+          gmb_post_id: string
+          id: string
+          location_id: string
+          post_data: Json
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id?: number | null
+          created_at?: string | null
+          gmb_post_id: string
+          id?: string
+          location_id: string
+          post_data: Json
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: number | null
+          created_at?: string | null
+          gmb_post_id?: string
+          id?: string
+          location_id?: string
+          post_data?: Json
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gmb_posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "business_listing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_auth_tokens: {
+        Row: {
+          access_token: string
+          client_id: number | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          refresh_token: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token: string
+          client_id?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          client_id?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_auth_tokens_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "business_listing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       image: {
         Row: {
           alt_text: string | null
