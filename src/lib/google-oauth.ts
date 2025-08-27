@@ -27,7 +27,7 @@ export class GoogleOAuthManager {
 
   static async exchangeCodeForTokens(code: string) {
     try {
-      const { tokens } = await oauth2Client.getAccessToken(code);
+      const { tokens } = await oauth2Client.getToken(code);
       return tokens;
     } catch (error) {
       console.error('Error exchanging code for tokens:', error);
@@ -59,6 +59,7 @@ export class GoogleOAuthManager {
       await oauth2.userinfo.get();
       
       return accessToken;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Token is expired, try to refresh
       console.log('Access token expired, refreshing...');

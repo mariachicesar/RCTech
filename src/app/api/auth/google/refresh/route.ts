@@ -1,14 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
-    const { refreshToken } = req.body;
+export async function POST(req: NextRequest) {
+    const { refreshToken } = await req.json();
 
     if (!refreshToken) {
-        return res.status(400).json({ error: 'Refresh token is required' });
+        return NextResponse.json({ error: 'Refresh token is required' }, { status: 400 });
     }
 
     try {
@@ -28,14 +24,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Google refresh token error:', errorData);
-            return res.status(400).json({ error: 'Failed to refresh token' });
+            return NextResponse.json({ error: 'Failed to refresh token' }, { status: 400 });
         }
 
         const { access_token } = await response.json();
         
-        return res.status(200).json({ accessToken: access_token });
+        return NextResponse.json({ accessToken: access_token });
     } catch (error) {
         console.error('Error refreshing Google token:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

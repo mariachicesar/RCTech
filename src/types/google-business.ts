@@ -43,7 +43,9 @@ export interface ProductDetails {
 
 export interface PostCreationResponse {
   success: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post?: any;
   error?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details?: any;
 }

@@ -49,6 +49,7 @@ export default function SignInForm() {
     return () => subscription.unsubscribe();
   }, [router]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const saveGoogleTokens = async (session: any) => {
     console.log('Session data:', session); // Debug log
     
@@ -99,7 +100,7 @@ export default function SignInForm() {
     const redirectUrl = `${window.location.origin}/auth/callback-handler`;
     console.log('Using redirect URL:', redirectUrl);
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         scopes: 'https://www.googleapis.com/auth/business.manage https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
