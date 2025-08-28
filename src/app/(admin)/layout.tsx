@@ -17,7 +17,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const { isExpanded, isHovered, isMobileOpen, setActiveUser } = useSidebar();
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null)
@@ -25,6 +25,7 @@ export default function AdminLayout({
   const fetchSession = async () => {
     const currentSession = await supabase.auth.getSession()
     setSession(currentSession.data.session)
+    setActiveUser(currentSession.data.session?.user || null)
   }
 
   useEffect(() => {

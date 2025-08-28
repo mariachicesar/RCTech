@@ -5,6 +5,324 @@ import PageBreadcrumb from "../../../../../components/common/PageBreadCrumb";
 import Input from "../../../../../components/form/input/InputField";
 import Label from "../../../../../components/form/Label";
 import Link from "next/link";
+import Button from "../../../../../components/ui/button/Button";
+import { useContentAgent } from "../../../../../hooks/useContentAgent";
+import React from "react";
+
+// Types for better type safety
+interface ContentItem {
+    idea: string;
+    keywordTargets?: string[];
+}
+
+interface ContentAgentData {
+    content?: string;
+    markdownContent?: string;
+    metadata?: {
+        title: string;
+        description: string;
+        keywords: string[];
+    } | string;
+    competitorAnalysis?: string;
+    ideas?: ContentItem[];
+    content_ideas?: ContentItem[];
+    contentIdeas?: ContentItem[];
+    role?: string;
+    step?: string;
+    message?: string;
+    conversationHistory?: Record<string, unknown>[];
+}
+
+interface ChatMessage {
+    id: string;
+    type: 'user' | 'assistant';
+    content: string;
+    data?: ContentAgentData;
+    timestamp: Date;
+    isIdeaSelection?: boolean;
+    ideas?: ContentItem[];
+}
+
+// Helper: parse ideas from OpenAI response
+function parseIdeas(data: ContentAgentData): ContentItem[] {
+    try {
+        // Direct ideas array from your API response structure
+        if (data?.ideas && Array.isArray(data.ideas)) {
+            return data.ideas;
+        }
+        
+        // Try to parse from content string
+        const content = typeof data?.content === "string" ? JSON.parse(data.content) : data?.content;
+        if (Array.isArray(content)) {
+            return content.map((item: ContentItem | string) => 
+                typeof item === 'string' ? { idea: item, keywordTargets: [] } : item
+            );
+        }
+        if (content?.ideas) {
+            return content.ideas;
+        }
+        if (content?.content_ideas) {
+            return content.content_ideas;
+        }
+        if (content?.contentIdeas) {
+            return content.contentIdeas;
+        }
+        return [];
+    } catch {
+        return [];
+    }
+}
+
+const ChatInterface = ({
+    messages,
+    isLoading,
+    onChooseIdea,
+    onSendMessage,
+    onGenerateMetadata
+}: {
+    messages: ChatMessage[];
+    isLoading: boolean;
+    onChooseIdea: (idea: string) => void;
+    onSendMessage: (message: string) => void;
+    onGenerateMetadata: (content: string) => void;
+}) => {
+    const [inputMessage, setInputMessage] = useState("");
+
+    const handleSend = () => {
+        if (inputMessage.trim()) {
+            onSendMessage(inputMessage);
+            setInputMessage("");
+        }
+    };
+
+    return (
+        <ComponentCard title="Content Agent Chat">
+            <div className="flex flex-col h-">
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto space-y-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                    {messages.length === 0 && (
+                        <div className="text-center text-gray-500 dark:text-gray-400">
+                            Fill out the form and click &quot;Start Conversation&quot; to begin
+                        </div>
+                    )}
+                    
+                    {messages.map((message) => (
+                        <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-3/4 p-3 rounded-lg ${
+                                message.type === 'user' 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-white dark:bg-gray-700 border'
+                            }`}>
+                                {message.type === 'assistant' && message.ideas && message.ideas.length > 0 ? (
+                                    <div>
+                                        <p className="mb-3 font-medium">Here are 3 content ideas for your business:</p>
+                                        <div className="space-y-2">
+                                            {message.ideas.map((idea, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    className="w-full text-left p-3 bg-gray-50 dark:bg-gray-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900 hover:border-blue-300 dark:hover:border-blue-600 border border-transparent transition-all duration-200 transform hover:scale-105 hover:shadow-md"
+                                                    onClick={() => onChooseIdea(idea.idea)}
+                                                >
+                                                    <div className="font-medium text-blue-600 dark:text-blue-400 mb-1">
+                                                        💡 Idea #{idx + 1} - Click to Select
+                                                    </div>
+                                                    <div className="text-sm text-gray-700 dark:text-gray-200 font-medium">
+                                                        {idea.idea}
+                                                    </div>
+                                                    {idea.keywordTargets && idea.keywordTargets.length > 0 && (
+                                                        <div className="mt-2 flex flex-wrap gap-1">
+                                                            {idea.keywordTargets.slice(0, 3).map((keyword, kidx) => (
+                                                                <span key={kidx} className="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded text-xs">
+                                                                    {keyword}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                                            👆 <strong>Click any idea above</strong> to automatically generate the complete content strategy (outline + competitor analysis + SEO metadata)
+                                        </div>
+                                        
+                                        {/* Raw Response Collapsible */}
+                                        {message.data && (
+                                            <details className="mt-4 cursor-pointer">
+                                                <summary className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                                                    View Raw Response
+                                                </summary>
+                                                <pre className="mt-2 bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs whitespace-pre-wrap overflow-auto max-h-40 text-gray-600 dark:text-gray-300">
+                                                    {JSON.stringify(message.data, null, 2)}
+                                                </pre>
+                                            </details>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="whitespace-pre-wrap">{message.content}</p>
+                                        
+                                        {/* Show Generate Metadata button after content outline (only for old step) */}
+                                        {message.data?.step === 'outline_generated' && (
+                                            <div className="mt-3">
+                                                <button
+                                                    onClick={() => {
+                                                        if (message.data?.content) {
+                                                            onGenerateMetadata(message.data.content);
+                                                        }
+                                                    }}
+                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                                >
+                                                    🏷️ Generate SEO Metadata
+                                                </button>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Show action buttons for complete workflow */}
+                                        {message.data?.step === 'complete_workflow' && (
+                                            <div className="mt-3 space-y-2">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {message.data?.markdownContent && (
+                                                        <button
+                                                            onClick={() => {
+                                                                if (message.data?.markdownContent) {
+                                                                    navigator.clipboard.writeText(message.data.markdownContent);
+                                                                    // Show a temporary success message
+                                                                    const btn = document.activeElement as HTMLButtonElement;
+                                                                    const originalText = btn.textContent;
+                                                                    btn.textContent = '✅ Copied!';
+                                                                    btn.disabled = true;
+                                                                    setTimeout(() => {
+                                                                        btn.textContent = originalText;
+                                                                        btn.disabled = false;
+                                                                    }, 2000);
+                                                                }
+                                                            }}
+                                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                                        >
+                                                            📄 Copy Markdown Content
+                                                        </button>
+                                                    )}
+                                                    {message.data?.metadata && (
+                                                        <button
+                                                            onClick={() => {
+                                                                if (message.data?.metadata) {
+                                                                    const metadata = typeof message.data.metadata === 'string' ? JSON.parse(message.data.metadata) : message.data.metadata;
+                                                                    const metadataText = `Title: ${metadata.title}\nDescription: ${metadata.description}\nKeywords: ${metadata.keywords.join(', ')}`;
+                                                                    navigator.clipboard.writeText(metadataText);
+                                                                    // Show a temporary success message
+                                                                    const btn = document.activeElement as HTMLButtonElement;
+                                                                    const originalText = btn.textContent;
+                                                                    btn.textContent = '✅ Copied!';
+                                                                    btn.disabled = true;
+                                                                    setTimeout(() => {
+                                                                        btn.textContent = originalText;
+                                                                        btn.disabled = false;
+                                                                    }, 2000);
+                                                                }
+                                                            }}
+                                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                                        >
+                                                            🏷️ Copy SEO Metadata
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            onSendMessage("I'd like to create another content strategy with different parameters.");
+                                                        }}
+                                                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                                                    >
+                                                        🔄 Create Another Strategy
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            onSendMessage("Can you help me optimize this content further or create variations?");
+                                                        }}
+                                                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                                                    >
+                                                        ⚡ Optimize Further
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Show restart button for complete workflow (old version) */}
+                                        {message.data?.step === 'complete_workflow_old' && (
+                                            <div className="mt-3">
+                                                <button
+                                                    onClick={() => {
+                                                        onSendMessage("I'd like to create another content strategy with different parameters.");
+                                                    }}
+                                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm mr-2"
+                                                >
+                                                    🔄 Create Another Strategy
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        onSendMessage("Can you help me optimize this content further?");
+                                                    }}
+                                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                                                >
+                                                    ⚡ Optimize Further
+                                                </button>
+                                            </div>
+                                        )}
+                                        
+                                        {message.data && (
+                                            <details className="mt-3 cursor-pointer">
+                                                <summary className="text-sm opacity-70 hover:opacity-100">
+                                                    View Raw Response
+                                                </summary>
+                                                <pre className="mt-2 bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs whitespace-pre-wrap overflow-auto max-h-40 opacity-70">
+                                                    {JSON.stringify(message.data, null, 2)}
+                                                </pre>
+                                            </details>
+                                        )}
+                                    </div>
+                                )}
+                                <div className="text-xs opacity-60 mt-2">
+                                    {message.timestamp.toLocaleTimeString()}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {isLoading && (
+                        <div className="flex justify-start">
+                            <div className="bg-white dark:bg-gray-700 border p-3 rounded-lg">
+                                <div className="flex items-center space-x-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                    <span className="text-gray-600 dark:text-gray-300">AI is thinking...</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
+                {/* Chat Input */}
+                <div className="mt-4 flex space-x-2">
+                    <input
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder="Continue the conversation..."
+                        className="flex-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                        disabled={isLoading}
+                    />
+                    <Button 
+                        onClick={handleSend}
+                        disabled={isLoading || !inputMessage.trim()}
+                        className="btn btn-primary"
+                    >
+                        Send
+                    </Button>
+                </div>
+            </div>
+        </ComponentCard>
+    );
+};
 
 const ChatGPTPage = () => {
     const [formData, setFormData] = useState({
@@ -16,16 +334,256 @@ const ChatGPTPage = () => {
         competitor2Url: "",
         service: "",
     });
+
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const { trigger, data, error, isLoading } = useContentAgent();
+
+    // Effect to handle API responses and add them to chat
+    React.useEffect(() => {
+        if (data && !isLoading) {
+            const ideas = parseIdeas(data);
+            const messageId = Date.now().toString();
+            
+            if (ideas.length > 0 && data.step === 'ideas_generated') {
+                // This is a content ideas response
+                setChatMessages(prev => [...prev, {
+                    id: messageId,
+                    type: 'assistant',
+                    content: data.message || 'Here are some content ideas for your business:',
+                    data,
+                    timestamp: new Date(),
+                    isIdeaSelection: true,
+                    ideas
+                }]);
+            } else if (data.step === 'complete_workflow') {
+                // Complete workflow: outline, markdown content, competitor analysis, and metadata
+                let content = `**✅ Content Strategy Complete!**\n\n`;
+                
+                content += `**📝 Content Outline:**\n${data.content}\n\n`;
+                
+                if (data.markdownContent) {
+                    content += `**📄 Full Markdown Content:**\n\`\`\`markdown\n${data.markdownContent}\n\`\`\`\n\n`;
+                }
+                
+                if (data.competitorAnalysis) {
+                    content += `**🔍 Competitor Analysis:**\n${data.competitorAnalysis}\n\n`;
+                }
+                
+                if (data.metadata) {
+                    const metadata = typeof data.metadata === 'string' ? JSON.parse(data.metadata) : data.metadata;
+                    content += `**🏷️ SEO Metadata:**\n`;
+                    content += `• **Title:** ${metadata.title}\n`;
+                    content += `• **Description:** ${metadata.description}\n`;
+                    content += `• **Keywords:** ${metadata.keywords.join(', ')}\n\n`;
+                }
+                
+                content += `*Your complete content strategy is ready! You can copy the markdown content and use it directly in your CMS.*`;
+                
+                setChatMessages(prev => [...prev, {
+                    id: messageId,
+                    type: 'assistant',
+                    content,
+                    data,
+                    timestamp: new Date()
+                }]);
+            } else if (data.step === 'outline_generated') {
+                // Content outline was generated
+                let content = `**Content Outline Generated:**\n\n${data.content}`;
+                
+                if (data.competitorAnalysis) {
+                    content += `\n\n**Competitor Analysis:**\n${data.competitorAnalysis}`;
+                }
+                
+                content += `\n\n*You can now ask me to generate SEO metadata for this content, or continue the conversation.*`;
+                
+                setChatMessages(prev => [...prev, {
+                    id: messageId,
+                    type: 'assistant',
+                    content,
+                    data,
+                    timestamp: new Date()
+                }]);
+            } else if (data.step === 'metadata_generated') {
+                // Metadata was generated
+                const content = `**SEO Metadata Generated:**\n\n${data.content}`;
+                
+                setChatMessages(prev => [...prev, {
+                    id: messageId,
+                    type: 'assistant',
+                    content,
+                    data,
+                    timestamp: new Date()
+                }]);
+            } else {
+                // This is a regular response
+                const content = typeof data.content === 'string' ? data.content : JSON.stringify(data, null, 2);
+                setChatMessages(prev => [...prev, {
+                    id: messageId,
+                    type: 'assistant',
+                    content: content,
+                    data,
+                    timestamp: new Date()
+                }]);
+            }
+        }
+        
+        if (error && !isLoading) {
+            setChatMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'assistant',
+                content: `Error: ${error.message || String(error)}`,
+                timestamp: new Date()
+            }]);
+        }
+    }, [data, error, isLoading]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Add user message to chat
+        const userMessage = `Starting content generation for ${formData.industry} business in ${formData.city}, targeting "${formData.keyword}"`;
+        setChatMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: userMessage,
+            timestamp: new Date()
+        }]);
+        
+        trigger(formData);
+    };
+
+    // Handler for choosing an idea and triggering the next step
+    const handleChooseIdea = (idea: string) => {
+        // Add user selection to chat
+        setChatMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: `I choose this idea: "${idea}"\n\nPlease continue with competitor analysis and content development.`,
+            timestamp: new Date()
+        }]);
+        
+        // Call trigger with the chosen idea
+        trigger({ ...formData, userChosenIdea: idea });
+    };
+
+    // Handler for generating metadata
+    const handleGenerateMetadata = (content: string) => {
+        // Add user message to chat
+        setChatMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: "Generate SEO metadata for this content outline",
+            timestamp: new Date()
+        }]);
+        
+        // Call API with content to generate metadata
+        trigger({ ...formData, content });
+    };
+
+    // Handler for custom messages in chat
+    const handleSendMessage = (message: string) => {
+        setChatMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: message,
+            timestamp: new Date()
+        }]);
+        
+        // Check if user is manually selecting an idea (e.g., "idea #1", "idea 2", "choose idea 3")
+        const ideaMatch = message.toLowerCase().match(/idea\s*#?(\d+)/);
+        if (ideaMatch) {
+            const ideaNumber = parseInt(ideaMatch[1]) - 1; // Convert to 0-based index
+            
+            // Find the most recent ideas message
+            const lastIdeasMessage = chatMessages
+                .slice()
+                .reverse()
+                .find(msg => msg.ideas && msg.ideas.length > 0);
+                
+            if (lastIdeasMessage && lastIdeasMessage.ideas && lastIdeasMessage.ideas[ideaNumber]) {
+                const selectedIdea = lastIdeasMessage.ideas[ideaNumber].idea;
+                // Use the same logic as handleChooseIdea
+                setChatMessages(prev => [...prev, {
+                    id: Date.now().toString(),
+                    type: 'assistant',
+                    content: `Perfect! You've selected: "${selectedIdea}"\n\nLet me create the complete content strategy for you...`,
+                    timestamp: new Date()
+                }]);
+                
+                trigger({ ...formData, userChosenIdea: selectedIdea });
+                return;
+            }
+        }
+        
+        // Check if user is asking for metadata generation
+        if (message.toLowerCase().includes('metadata') || message.toLowerCase().includes('seo')) {
+            // Look for the most recent content outline in the chat
+            const lastOutlineMessage = chatMessages
+                .slice()
+                .reverse()
+                .find(msg => msg.data?.step === 'outline_generated');
+                
+            if (lastOutlineMessage && lastOutlineMessage.data?.content) {
+                // Generate metadata for the content
+                trigger({ ...formData, content: lastOutlineMessage.data.content });
+                return;
+            }
+        }
+        
+        // Check if user wants to create another strategy
+        if (message.toLowerCase().includes('another') || message.toLowerCase().includes('create') || message.toLowerCase().includes('different parameters')) {
+            setTimeout(() => {
+                setChatMessages(prev => [...prev, {
+                    id: Date.now().toString(),
+                    type: 'assistant',
+                    content: `Great! To create another content strategy, please fill out the form above with new parameters and click "Start Conversation" again. 
+
+You can modify:
+- Target city
+- Industry 
+- Main keyword
+- Competitor URLs
+- Our website URL
+
+This will give you fresh content ideas tailored to your new parameters.`,
+                    timestamp: new Date()
+                }]);
+            }, 1000);
+            return;
+        }
+        
+        // For other messages, provide a helpful response
+        setTimeout(() => {
+            setChatMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'assistant',
+                content: `I received your message: "${message}". 
+
+Here's what I can help you with:
+- Select an idea by clicking the buttons above or typing "idea #1", "idea #2", etc.
+- Generate new content strategies with different parameters
+- Answer questions about SEO and content marketing
+- Provide guidance on implementing your content strategy
+
+What would you like to explore?`,
+                timestamp: new Date()
+            }]);
+        }, 1000);
+    };
+
+
+
     return (
         <div>
             <PageBreadcrumb pageTitle="Prompts" />
             <ComponentCard title="Ask ChatGPT">
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                    <form className="space-y-6 gap-2 grid grid-cols-1 xl:grid-cols-2">
+                    <form className="space-y-6 gap-2 grid grid-cols-1 xl:grid-cols-2" onSubmit={handleSubmit}>
                         <div>
                             <Label>Our Url</Label>
                             <Input type="text" name="ourUrl" value={formData.ourUrl} onChange={handleChange} />
@@ -54,6 +612,9 @@ const ChatGPTPage = () => {
                             <Label>Service</Label>
                             <Input type="text" name="service" value={formData.service} onChange={handleChange} />
                         </div>
+                        <div className="">
+                        <Button type="submit" className="btn btn-primary">Ai Generate</Button>
+                        </div>
                     </form>
                     <div>
                         <ul>
@@ -75,6 +636,18 @@ const ChatGPTPage = () => {
                     </div>
                 </div>
             </ComponentCard>
+
+            {/* Chat Interface */}
+            <div className="mt-6">
+            <ChatInterface
+                messages={chatMessages}
+                isLoading={isLoading}
+                onChooseIdea={handleChooseIdea}
+                onSendMessage={handleSendMessage}
+                onGenerateMetadata={handleGenerateMetadata}
+            />
+            </div>
+
 
             <ComponentCard title="SEO & Content ChatGPT Prompts" className="mt-6">
                 <div className="space-y-8">

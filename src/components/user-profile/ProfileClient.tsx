@@ -13,7 +13,7 @@ import { supabase } from "../../superbase-client";
 
 const ProfileClient: React.FC = () => {
     // Context
-    const { user } = useSidebar();
+    const { selectedClient } = useSidebar();
 
     // State to manage new user creation form visibility
     const [isNewUser, setIsNewUser] = useState(false);
@@ -103,7 +103,7 @@ const ProfileClient: React.FC = () => {
             </Modal>
             <div className="space-y-6">
                 <UserMetaCard />
-                <UserInfoCard user={user} />
+                <UserInfoCard user={selectedClient} />
                 <UserBusinessCard />
             </div>
         </div>

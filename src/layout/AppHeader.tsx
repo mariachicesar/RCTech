@@ -13,7 +13,7 @@ import { useUser } from "../hooks/useUser";
 
 const AppHeader = ({  }: { session: Session }) => {
   // Context
-    const { isMobileOpen, toggleSidebar, toggleMobileSidebar, setActiveUser } = useSidebar();
+    const { isMobileOpen, toggleSidebar, toggleMobileSidebar, setSelectedClient } = useSidebar();
 
   // State
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -26,9 +26,9 @@ const AppHeader = ({  }: { session: Session }) => {
 
   useEffect(()=>{
     if (Array.isArray(user) && user[0]) {
-      setActiveUser(user[0])
+      setSelectedClient(user[0])
     }
-  }, [user, setActiveUser])
+  }, [user, setSelectedClient])
 
 
   const handleToggle = () => {
@@ -193,7 +193,7 @@ const AppHeader = ({  }: { session: Session }) => {
                   onClick={() => {
                     setUserId(null);
                     setSearchValue("");
-                    setActiveUser(null);
+                    setSelectedClient(null);
                   }}
                   className="absolute right-2.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[7px] py-[4.5px] text-xs -tracking-[0.2px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
                 >
