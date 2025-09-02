@@ -394,6 +394,17 @@ export type Database = {
           title: string | null
           type: string | null
           website_id: number | null
+          page_type: string | null
+          parent_id: number | null
+          sort_order: number
+          is_published: boolean
+          is_main_nav: boolean
+          template_type: string | null
+          meta_description: string | null
+          meta_keywords: string | null
+          featured_image_url: string | null
+          excerpt: string | null
+          updated_at: string | null
         }
         Insert: {
           content?: string | null
@@ -403,6 +414,17 @@ export type Database = {
           title?: string | null
           type?: string | null
           website_id?: number | null
+          page_type?: string | null
+          parent_id?: number | null
+          sort_order?: number
+          is_published?: boolean
+          is_main_nav?: boolean
+          template_type?: string | null
+          meta_description?: string | null
+          meta_keywords?: string | null
+          featured_image_url?: string | null
+          excerpt?: string | null
+          updated_at?: string | null
         }
         Update: {
           content?: string | null
@@ -412,6 +434,17 @@ export type Database = {
           title?: string | null
           type?: string | null
           website_id?: number | null
+          page_type?: string | null
+          parent_id?: number | null
+          sort_order?: number
+          is_published?: boolean
+          is_main_nav?: boolean
+          template_type?: string | null
+          meta_description?: string | null
+          meta_keywords?: string | null
+          featured_image_url?: string | null
+          excerpt?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -419,6 +452,13 @@ export type Database = {
             columns: ["website_id"]
             isOneToOne: false
             referencedRelation: "website"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "page"
             referencedColumns: ["id"]
           },
         ]
@@ -455,6 +495,96 @@ export type Database = {
             columns: ["page_id"]
             isOneToOne: false
             referencedRelation: "page"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_category: {
+        Row: {
+          id: number
+          name: string
+          slug: string
+          description: string | null
+          parent_id: number | null
+          sort_order: number
+          is_active: boolean
+          website_id: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: number
+          name: string
+          slug: string
+          description?: string | null
+          parent_id?: number | null
+          sort_order?: number
+          is_active?: boolean
+          website_id?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: number
+          name?: string
+          slug?: string
+          description?: string | null
+          parent_id?: number | null
+          sort_order?: number
+          is_active?: boolean
+          website_id?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_category_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "website"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_category_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "page_category"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_page_category: {
+        Row: {
+          id: number
+          page_id: number
+          category_id: number
+          created_at: string | null
+        }
+        Insert: {
+          id?: number
+          page_id: number
+          category_id: number
+          created_at?: string | null
+        }
+        Update: {
+          id?: number
+          page_id?: number
+          category_id?: number
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_page_category_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "page"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_page_category_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "page_category"
             referencedColumns: ["id"]
           },
         ]

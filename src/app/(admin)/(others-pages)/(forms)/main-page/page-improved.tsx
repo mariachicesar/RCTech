@@ -55,6 +55,7 @@ export default function FormMain() {
     setContent,
     selectPage,
     savePage,
+    resetPageState,
     createNewPage,
   } = usePageManager({
     websiteId: selectedClient?.website_id || null,
@@ -66,23 +67,15 @@ export default function FormMain() {
     if (seoData) {
       updateFormData({
         seoTitle: seoData.meta_title || "",
-        seoKeywords: seoData.keywords || "",
         seoDescription: seoData.meta_description || "",
+        seoKeywords: seoData.keywords || "",
         title: selectedPage?.title || "",
         slug: selectedPage?.slug || "",
       });
     }
   }, [seoData, selectedPage, updateFormData]);
 
-  // Handlers
-  const handleGetMarkdown = useCallback(() => {
-    setContent(editorRef.current?.getMarkdown() ?? "");
-  }, [setContent]);
-
-  const handleFocusEditor = useCallback(() => {
-    editorRef.current?.focus();
-  }, []);
-
+  // Handler functions
   const handleCreatePage = useCallback(() => {
     setShowCreationWizard(true);
     setViewMode('editor');
@@ -102,10 +95,6 @@ export default function FormMain() {
     setViewMode('editor');
   }, [selectPage]);
 
-  const handleDescriptionChange = useCallback((value: string) => {
-    handleInputChange("seoDescription", value);
-  }, [handleInputChange]);
-
   function handleSaveSuccess() {
     resetForm();
     setContent("");
@@ -116,6 +105,18 @@ export default function FormMain() {
       editorRef.current.setMarkdown(DEFAULT_MARKDOWN);
     }
   }
+
+  const handleGetMarkdown = useCallback(() => {
+    setContent(editorRef.current?.getMarkdown() ?? "");
+  }, [setContent]);
+
+  const handleFocusEditor = useCallback(() => {
+    editorRef.current?.focus();
+  }, []);
+
+  const handleDescriptionChange = useCallback((value: string) => {
+    handleInputChange("seoDescription", value);
+  }, [handleInputChange]);
 
   const handleSavePage = useCallback(async () => {
     const isValid = validateAllFields();
@@ -137,7 +138,7 @@ export default function FormMain() {
         <div className="fixed top-4 right-4 z-50">
           <Alert
             variant="success"
-            title="Insert was successful"
+            title="Success"
             message="Your changes have been saved."
             timeout={5000}
             onClose={() => setShowAlert(false)}
@@ -150,13 +151,13 @@ export default function FormMain() {
       {/* View Toggle */}
       <div className="mb-6 flex gap-4">
         <Button
-          variant={viewMode === 'organizer' ? 'primary' : 'outline'}
+          variant={viewMode === 'organizer' ? 'primary' : 'secondary'}
           onClick={() => setViewMode('organizer')}
         >
           Page Organizer
         </Button>
         <Button
-          variant={viewMode === 'editor' ? 'primary' : 'outline'}
+          variant={viewMode === 'editor' ? 'primary' : 'secondary'}
           onClick={() => setViewMode('editor')}
         >
           Page Editor
@@ -198,7 +199,7 @@ export default function FormMain() {
                       </Button>
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="secondary"
                         onClick={() => setViewMode('organizer')}
                       >
                         Back to Organizer
@@ -269,4 +270,3 @@ export default function FormMain() {
     </div>
   );
 }
-
