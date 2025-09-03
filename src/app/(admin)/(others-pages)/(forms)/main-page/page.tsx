@@ -186,6 +186,7 @@ export default function FormMain() {
                       setShowCreationWizard(false);
                       setViewMode('organizer');
                     }}
+                    enableAIContent={true}
                   />
                 ) : (
                   <>

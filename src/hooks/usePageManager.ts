@@ -55,7 +55,7 @@ export const usePageManager = ({ websiteId, onSuccess }: UsePageManagerProps) =>
     setContent("");
   }, []);
 
-  const createNewPage = useCallback(async (data: PageCreationData) => {
+  const createNewPage = useCallback(async (data: PageCreationData & { content?: string }) => {
     if (!websiteId) return;
 
     // Filter out fields that don't exist in the database schema
@@ -69,7 +69,7 @@ export const usePageManager = ({ websiteId, onSuccess }: UsePageManagerProps) =>
       meta_description: data.meta_description || null,
       meta_keywords: data.meta_keywords || null,
       website_id: websiteId,
-      content,
+      content: data.content || content, // Use provided content or default content state
       is_published: false, // Draft by default
       sort_order: 0,
     };

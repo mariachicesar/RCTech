@@ -64,10 +64,10 @@ export interface PageCreationData {
   title: string;
   slug: string;
   parent_id?: number | null;
-  category_ids?: number[];
   is_main_nav: boolean;
   meta_description?: string;
   meta_keywords?: string;
+  content?: string; // Added for AI-generated content
 }
 
 export interface FormData {
