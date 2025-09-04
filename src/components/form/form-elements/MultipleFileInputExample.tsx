@@ -52,39 +52,80 @@ export default forwardRef<MultipleFileInputRef, {
   const { uploadToS3 } = useS3Upload();
 
   const handleSaveImages = useCallback(async () => {
-    if (!imageUploadLocation.id) return;
-
-    const imagePayload = images.filter(img => img.uploadedUrl).map(img => ({
-      url: img.uploadedUrl,
-      alt_text: img.altText,
-      caption: img.caption,
-    }))
-
-    const response = await mutateUpdate({
-      path: "/image",
-      method: "POST",
-      payload: imagePayload,
-      additionalHeaders: {
-        Prefer: "return=representation",
-      },
-    });
-    console.log("Image upload response:", response);
-    if (response && Array.isArray(response.response)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload = response.response.map((img: any) => ({
-        [idFieldName]: imageUploadLocation.id,
-        image_id: img.id,
-      }));
-
-      // Handle successful response
-      mutateUpdate({
-        path: imageUploadLocation.table,
-        method: "POST",
-        payload: payload,
-      });
+    if (!imageUploadLocation.id) {
+      console.error('No page ID provided for image upload');
+      return;
     }
 
+    // Filter images that have been uploaded
+    const uploadedImages = images.filter(img => img.uploadedUrl);
+    
+    if (uploadedImages.length === 0) {
+      console.log('No images to save');
+      return;
+    }
 
+    const imagePayload = uploadedImages.map(img => ({
+      url: img.uploadedUrl,
+      alt_text: img.altText || null,
+      caption: img.caption || null,
+    }));
+
+    console.log('Attempting to save images:', imagePayload);
+    console.log('Image upload location:', imageUploadLocation);
+    console.log('ID field name:', idFieldName);
+
+    try {
+      // Step 1: Create image entries
+      const imageResponse = await mutateUpdate({
+        path: "/image",
+        method: "POST",
+        payload: imagePayload,
+        additionalHeaders: {
+          Prefer: "return=representation",
+        },
+      });
+      
+      console.log("Image creation response:", imageResponse);
+      
+      if (imageResponse.error) {
+        console.error("Error saving images:", imageResponse.error);
+        throw new Error(`Failed to create images: ${imageResponse.error}`);
+      }
+      
+      // Step 2: Create page_image relationships
+      if (imageResponse.response && Array.isArray(imageResponse.response)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const relationshipPayload = imageResponse.response.map((img: any) => ({
+          [idFieldName]: imageUploadLocation.id,
+          image_id: img.id,
+        }));
+
+        console.log('Creating page-image relationships:', relationshipPayload);
+
+        const relationshipResponse = await mutateUpdate({
+          path: imageUploadLocation.table,
+          method: "POST",
+          payload: relationshipPayload,
+        });
+        
+        console.log("Relationship creation response:", relationshipResponse);
+        
+        if (relationshipResponse.error) {
+          console.error("Error creating relationships:", relationshipResponse.error);
+          throw new Error(`Failed to create page-image relationships: ${relationshipResponse.error}`);
+        }
+        
+        console.log('✅ Successfully created images and relationships');
+      } else {
+        console.error('Unexpected image response format:', imageResponse.response);
+        throw new Error('Invalid response format from image creation');
+      }
+    } catch (error) {
+      console.error('Complete image save operation failed:', error);
+      // Re-throw to let parent components handle the error
+      throw error;
+    }
   }, [images, imageUploadLocation, idFieldName]);
 
   useImperativeHandle(ref, () => ({

@@ -68,6 +68,8 @@ export interface PageCreationData {
   meta_description?: string;
   meta_keywords?: string;
   content?: string; // Added for AI-generated content
+  website_id?: number; // Added for API compatibility
+  category_ids?: number[]; // Added for category relationships
 }
 
 export interface FormData {

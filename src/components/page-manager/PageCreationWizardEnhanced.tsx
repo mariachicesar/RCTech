@@ -290,7 +290,7 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
 
   const handleSubmit = () => {
     if (canSubmit && formData.page_type && formData.template_type && formData.title && formData.slug) {
-      const pageData: PageCreationData & { content?: string } = {
+      const pageData: PageCreationData = {
         page_type: formData.page_type,
         template_type: formData.template_type,
         title: formData.title,
@@ -299,12 +299,8 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
         is_main_nav: formData.is_main_nav || false,
         meta_description: formData.meta_description,
         meta_keywords: formData.meta_keywords,
+        content: selectedContent || undefined, // Add AI-generated content if available
       };
-      
-      // Add AI-generated content if available
-      if (selectedContent) {
-        pageData.content = selectedContent;
-      }
       
       onCreatePage(pageData);
     }

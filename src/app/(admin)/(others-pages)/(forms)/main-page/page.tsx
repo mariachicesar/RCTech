@@ -10,7 +10,7 @@ import Button from "@/components/ui/button/Button";
 import SeoMetadata from "@/components/form/form-elements/SeoMetadata";
 import Alert from "@/components/ui/alert/Alert";
 import PageOrganizer from "@/components/page-manager/PageOrganizer";
-import PageCreationWizard from "@/components/page-manager/PageCreationWizard";
+import PageCreationWithImages from "@/components/page-manager/PageCreationWithImages";
 import EditorSection from "@/components/page-manager/EditorSection";
 
 import { useSidebar } from "@/context/SidebarContext";
@@ -88,12 +88,30 @@ export default function FormMain() {
     setViewMode('editor');
   }, []);
 
-  const handleCreatePageSubmit = useCallback(async (data: PageCreationData) => {
-    const result = await createNewPage(data);
-    if (result?.response) {
-      setShowCreationWizard(false);
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+  const handleCreatePageSubmit = useCallback(async (data: PageCreationData & { content?: string }) => {
+    console.log('handleCreatePageSubmit called with:', data);
+    try {
+      const result = await createNewPage(data);
+      console.log('createNewPage result:', result);
+      
+      if (result?.response) {
+        setShowCreationWizard(false);
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+        
+        // If AI content was used, switch to editor view with the new page
+        if (data.content) {
+          setViewMode('editor');
+        }
+        
+        return result; // Return the result for image upload handling
+      } else {
+        console.error('Failed to create page - no response:', result);
+        return result;
+      }
+    } catch (error) {
+      console.error('Error in handleCreatePageSubmit:', error);
+      throw error;
     }
   }, [createNewPage]);
 
@@ -180,7 +198,7 @@ export default function FormMain() {
             <ComponentCard title="Page Management">
               <div className="space-y-6">
                 {showCreationWizard ? (
-                  <PageCreationWizard
+                  <PageCreationWithImages
                     onCreatePage={handleCreatePageSubmit}
                     onCancel={() => {
                       setShowCreationWizard(false);

@@ -81,7 +81,7 @@ export default function FormMain() {
     setViewMode('editor');
   }, []);
 
-  const handleCreatePageSubmit = useCallback(async (data: PageCreationData) => {
+  const handleCreatePageSubmit = useCallback(async (data: PageCreationData & { content?: string }) => {
     const result = await createNewPage(data);
     if (result?.response) {
       setShowCreationWizard(false);
