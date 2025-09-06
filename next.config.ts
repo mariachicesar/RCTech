@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    // Helps with client component bundling
+    optimizePackageImports: ['@mdxeditor/editor'],
+  },
   images: {
     remotePatterns: [
       {
