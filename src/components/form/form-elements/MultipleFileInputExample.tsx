@@ -52,39 +52,63 @@ export default forwardRef<MultipleFileInputRef, {
   const { uploadToS3 } = useS3Upload();
 
   const handleSaveImages = useCallback(async () => {
-    if (!imageUploadLocation.id) return;
-
-    const imagePayload = images.filter(img => img.uploadedUrl).map(img => ({
-      url: img.uploadedUrl,
-      alt_text: img.altText,
-      caption: img.caption,
-    }))
-
-    const response = await mutateUpdate({
-      path: "/image",
-      method: "POST",
-      payload: imagePayload,
-      additionalHeaders: {
-        Prefer: "return=representation",
-      },
-    });
-    console.log("Image upload response:", response);
-    if (response && Array.isArray(response.response)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload = response.response.map((img: any) => ({
-        [idFieldName]: imageUploadLocation.id,
-        image_id: img.id,
-      }));
-
-      // Handle successful response
-      mutateUpdate({
-        path: imageUploadLocation.table,
-        method: "POST",
-        payload: payload,
-      });
+    if (!imageUploadLocation.id) {
+      console.error('No page ID provided for image upload');
+      return;
     }
 
+    const uploadedImages = images.filter(img => img.uploadedUrl);
+    
+    if (uploadedImages.length === 0) {
+      console.log('No images to save');
+      return;
+    }
 
+    const imagePayload = uploadedImages.map(img => ({
+      url: img.uploadedUrl,
+      alt_text: img.altText || null,
+      caption: img.caption || null,
+    }));
+
+    try {
+      // Step 1: Create image entries
+      const imageResponse = await mutateUpdate({
+        path: "/image",
+        method: "POST",
+        payload: imagePayload,
+        additionalHeaders: {
+          Prefer: "return=representation",
+        },
+      });
+      
+      if (imageResponse.error) {
+        throw new Error(`Failed to create images: ${imageResponse.error}`);
+      }
+      
+      // Step 2: Create page_image relationships
+      if (imageResponse.response && Array.isArray(imageResponse.response)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const relationshipPayload = imageResponse.response.map((img: any) => ({
+          [idFieldName]: imageUploadLocation.id,
+          image_id: img.id,
+        }));
+
+        const relationshipResponse = await mutateUpdate({
+          path: imageUploadLocation.table,
+          method: "POST",
+          payload: relationshipPayload,
+        });
+        
+        if (relationshipResponse.error) {
+          throw new Error(`Failed to create page-image relationships: ${relationshipResponse.error}`);
+        }
+      } else {
+        throw new Error('Invalid response format from image creation');
+      }
+    } catch (error) {
+      console.error('Image save operation failed:', error);
+      throw error;
+    }
   }, [images, imageUploadLocation, idFieldName]);
 
   useImperativeHandle(ref, () => ({
@@ -192,21 +216,34 @@ export default forwardRef<MultipleFileInputRef, {
     const compressionTarget = targetSize - exifOverhead;
 
     let quality = 0.8;
-    let compressed: File = await imageCompressor(file, quality) as File;
+    let compressed: File | null = await imageCompressor(file, quality) as File | null;
+
+    // Handle case where compression fails
+    if (!compressed) {
+      console.warn('Image compression failed, using original file');
+      return file;
+    }
 
     if (compressed.size <= compressionTarget) {
       return compressed;
     }
 
-    while (compressed.size > compressionTarget && quality > 0.1) {
+    while (compressed && compressed.size > compressionTarget && quality > 0.1) {
       const sizeRatio = compressed.size / compressionTarget;
       const qualityStep = sizeRatio > 2 ? 0.2 : 0.1;
 
       quality = Math.max(0.1, quality - qualityStep);
-      compressed = await imageCompressor(file, quality) as File;
+      const newCompressed = await imageCompressor(file, quality) as File | null;
+      
+      if (!newCompressed) {
+        console.warn('Image compression failed at quality', quality, 'using previous result');
+        break;
+      }
+      
+      compressed = newCompressed;
     }
 
-    return compressed;
+    return compressed || file; // Fallback to original file if compression completely fails
   };
 
   const handleFileChange = async (imageId: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -240,8 +277,6 @@ export default forwardRef<MultipleFileInputRef, {
           uploading: false
         } : img
       ));
-
-      console.log(`Image ${imageId} processed and uploaded successfully to:`, url);
     } catch (error) {
       console.error(`Error processing image ${imageId}:`, error);
       // Reset uploading state on error
