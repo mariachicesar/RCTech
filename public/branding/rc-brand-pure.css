@@ -1,0 +1,311 @@
+/* RC Tech Bridge Brand Utilities - Pure CSS */
+
+/* Brand Colors as CSS Custom Properties */
+:root {
+  --rc-bronze: #CD7F32;
+  --rc-red: #C41E3A;
+  --rc-dark-bronze: #8B4513;
+  --rc-light-bronze: #DEB887;
+  --rc-deep-red: #8B0000;
+  --rc-white: #FFFFFF;
+  
+  /* RGB values for alpha transparency */
+  --rc-bronze-rgb: 205, 127, 50;
+  --rc-red-rgb: 196, 30, 58;
+  --rc-dark-bronze-rgb: 139, 69, 19;
+  --rc-light-bronze-rgb: 222, 184, 135;
+  --rc-deep-red-rgb: 139, 0, 0;
+}
+
+/* Brand Color Classes */
+.bg-rc-bronze { background-color: var(--rc-bronze); }
+.bg-rc-red { background-color: var(--rc-red); }
+.bg-rc-dark-bronze { background-color: var(--rc-dark-bronze); }
+.bg-rc-light-bronze { background-color: var(--rc-light-bronze); }
+.bg-rc-deep-red { background-color: var(--rc-deep-red); }
+
+.text-rc-bronze { color: var(--rc-bronze); }
+.text-rc-red { color: var(--rc-red); }
+.text-rc-dark-bronze { color: var(--rc-dark-bronze); }
+.text-rc-light-bronze { color: var(--rc-light-bronze); }
+.text-rc-deep-red { color: var(--rc-deep-red); }
+
+.border-rc-bronze { border-color: var(--rc-bronze); }
+.border-rc-red { border-color: var(--rc-red); }
+.border-rc-dark-bronze { border-color: var(--rc-dark-bronze); }
+.border-rc-light-bronze { border-color: var(--rc-light-bronze); }
+.border-rc-deep-red { border-color: var(--rc-deep-red); }
+
+/* Brand Gradients */
+.bg-gradient-rc-bronze {
+  background: linear-gradient(135deg, var(--rc-bronze) 0%, var(--rc-dark-bronze) 100%);
+}
+
+.bg-gradient-rc-red {
+  background: linear-gradient(135deg, var(--rc-red) 0%, var(--rc-deep-red) 100%);
+}
+
+.bg-gradient-rc-brand {
+  background: linear-gradient(135deg, var(--rc-bronze) 0%, var(--rc-red) 100%);
+}
+
+/* Brand Buttons */
+.btn-rc-primary {
+  background-color: var(--rc-bronze);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.btn-rc-primary:hover {
+  background-color: var(--rc-dark-bronze);
+  box-shadow: 0 10px 15px -3px rgba(var(--rc-bronze-rgb), 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-rc-secondary {
+  background-color: var(--rc-red);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.btn-rc-secondary:hover {
+  background-color: var(--rc-deep-red);
+  box-shadow: 0 10px 15px -3px rgba(var(--rc-red-rgb), 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-rc-outline {
+  border: 2px solid var(--rc-bronze);
+  color: var(--rc-bronze);
+  background-color: transparent;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-rc-outline:hover {
+  background-color: var(--rc-bronze);
+  color: white;
+}
+
+/* Brand Cards */
+.card-rc {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  border-left: 4px solid var(--rc-bronze);
+  transition: all 0.3s ease;
+}
+
+.card-rc:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border-left-color: var(--rc-red);
+}
+
+/* Brand Shadows */
+.shadow-rc {
+  box-shadow: 0 4px 6px -1px rgba(var(--rc-bronze-rgb), 0.1), 0 2px 4px -1px rgba(var(--rc-bronze-rgb), 0.06);
+}
+
+.shadow-rc-lg {
+  box-shadow: 0 10px 15px -3px rgba(var(--rc-bronze-rgb), 0.1), 0 4px 6px -2px rgba(var(--rc-bronze-rgb), 0.05);
+}
+
+/* Logo Styles */
+.rc-logo-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rc-logo-text {
+  color: var(--rc-bronze);
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.rc-logo-bridge {
+  width: 32px;
+  height: 4px;
+  background-color: var(--rc-red);
+  border-radius: 2px;
+}
+
+.rc-logo-subtext {
+  color: var(--rc-red);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Brand Animations */
+@keyframes rc-fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes rc-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-rc-fade-in {
+  animation: rc-fade-in 0.6s ease-out;
+}
+
+.animate-rc-pulse {
+  animation: rc-pulse 2s infinite;
+}
+
+/* Brand Typography */
+.heading-rc {
+  color: var(--rc-bronze);
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.subheading-rc {
+  color: var(--rc-red);
+  font-weight: 600;
+}
+
+/* Brand Alerts */
+.alert-rc-success {
+  background-color: #F0FDF4;
+  border-left: 4px solid #22C55E;
+  padding: 16px;
+  color: #15803D;
+}
+
+.alert-rc-warning {
+  background-color: #FFFBEB;
+  border-left: 4px solid var(--rc-bronze);
+  padding: 16px;
+  color: var(--rc-dark-bronze);
+}
+
+.alert-rc-error {
+  background-color: #FEF2F2;
+  border-left: 4px solid var(--rc-red);
+  padding: 16px;
+  color: var(--rc-deep-red);
+}
+
+/* Responsive Logo Classes */
+.rc-logo-sm { font-size: 1.125rem; }
+.rc-logo-md { font-size: 1.5rem; }
+.rc-logo-lg { font-size: 2.25rem; }
+.rc-logo-xl { font-size: 3.75rem; }
+
+/* Navigation Brand Styles */
+.nav-rc {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(var(--rc-bronze-rgb), 0.1);
+  border-bottom: 1px solid var(--rc-light-bronze);
+}
+
+.nav-rc-item {
+  color: #374151;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  padding: 8px 16px;
+}
+
+.nav-rc-item:hover {
+  color: var(--rc-bronze);
+}
+
+.nav-rc-active {
+  color: var(--rc-bronze);
+  border-bottom: 2px solid var(--rc-bronze);
+}
+
+/* Form Brand Styles */
+.input-rc {
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.input-rc:focus {
+  outline: none;
+  border-color: var(--rc-bronze);
+  box-shadow: 0 0 0 3px rgba(var(--rc-bronze-rgb), 0.1);
+}
+
+.select-rc {
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  padding: 8px 16px;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.select-rc:focus {
+  outline: none;
+  border-color: var(--rc-bronze);
+  box-shadow: 0 0 0 3px rgba(var(--rc-bronze-rgb), 0.1);
+}
+
+/* Brand Footer */
+.footer-rc {
+  background-color: var(--rc-dark-bronze);
+  color: white;
+}
+
+.footer-rc-link {
+  color: var(--rc-light-bronze);
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.footer-rc-link:hover {
+  color: white;
+}
+
+/* Utility Classes for Quick Styling */
+.text-center { text-align: center; }
+.font-bold { font-weight: bold; }
+.font-semibold { font-weight: 600; }
+.uppercase { text-transform: uppercase; }
+.rounded { border-radius: 4px; }
+.rounded-lg { border-radius: 8px; }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+.p-4 { padding: 16px; }
+.p-6 { padding: 24px; }
+.p-8 { padding: 32px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.space-x-2 > * + * { margin-left: 8px; }
+.space-x-4 > * + * { margin-left: 16px; }

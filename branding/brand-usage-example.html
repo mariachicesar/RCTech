@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RC Tech Bridge - Brand Usage Examples</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-bronze': '#CD7F32',
+                        'brand-red': '#C41E3A',
+                        'brand-dark-bronze': '#8B4513',
+                        'brand-light-bronze': '#DEB887',
+                        'brand-deep-red': '#8B0000',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Brand CSS -->
+    <link rel="stylesheet" href="rc-brand-pure.css">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon-64x64.svg">
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="favicons/favicon-32x32.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="favicons/favicon-16x16.svg">
+    <link rel="apple-touch-icon" href="favicons/apple-touch-icon.svg">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="nav-rc p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <div class="rc-logo-container">
+                <span class="rc-logo-text text-brand-bronze text-2xl font-bold">R</span>
+                <div class="rc-logo-bridge"></div>
+                <span class="rc-logo-text text-brand-bronze text-2xl font-bold">C</span>
+                <div class="ml-3">
+                    <div class="text-brand-bronze font-bold text-lg">TECH</div>
+                    <div class="text-brand-red font-bold text-lg -mt-1">BRIDGE</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Items -->
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="nav-rc-item nav-rc-active">Home</a>
+                <a href="#" class="nav-rc-item">Services</a>
+                <a href="#" class="nav-rc-item">About</a>
+                <a href="#" class="nav-rc-item">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-white py-16">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h1 class="heading-rc text-5xl mb-6">Bridging Business & Technology</h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                Focus on growing your business while we handle all the technical obstacles. 
+                RC Tech Bridge provides seamless technology solutions that work behind the scenes.
+            </p>
+            <div class="space-x-4">
+                <button class="btn-rc-primary">Get Started</button>
+                <button class="btn-rc-outline">Learn More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="heading-rc text-3xl text-center mb-12">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <div class="card-rc">
+                    <div class="w-12 h-12 bg-brand-bronze rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-bronze mb-3">Web Development</h3>
+                    <p class="text-gray-600">Custom websites and web applications that grow with your business.</p>
+                </div>
+
+                <div class="card-rc">
+                    <div class="w-12 h-12 bg-brand-red rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-bronze mb-3">System Integration</h3>
+                    <p class="text-gray-600">Seamlessly connect your existing tools and processes.</p>
+                </div>
+
+                <div class="card-rc">
+                    <div class="w-12 h-12 bg-brand-bronze rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M18.384,2.164a1.5,1.5,0,0,0-1.061-.439H15V.5A.5.5,0,0,0,14.5,0h-9A.5.5,0,0,0,5,.5V1.725H2.677a1.5,1.5,0,0,0-1.061.439,1.5,1.5,0,0,0-.441,1.061V18.5A1.5,1.5,0,0,0,2.677,20H17.323A1.5,1.5,0,0,0,18.825,18.5V3.225A1.5,1.5,0,0,0,18.384,2.164Z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-bronze mb-3">Technical Support</h3>
+                    <p class="text-gray-600">Ongoing support to keep your technology running smoothly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-gradient-rc-bronze py-16">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-white mb-6">Ready to Focus on Your Business?</h2>
+            <p class="text-xl text-brand-light-bronze mb-8">
+                Let us handle the technical obstacles while you concentrate on growth.
+            </p>
+            <button class="btn-rc-secondary">Start Your Project</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-rc py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo and Description -->
+                <div class="md:col-span-2">
+                    <div class="rc-logo-container mb-4">
+                        <span class="rc-logo-text text-brand-light-bronze text-2xl font-bold">R</span>
+                        <div class="w-8 h-1 bg-brand-red rounded-full"></div>
+                        <span class="rc-logo-text text-brand-light-bronze text-2xl font-bold">C</span>
+                        <div class="ml-3">
+                            <div class="text-brand-light-bronze font-bold text-lg">TECH</div>
+                            <div class="text-brand-red font-bold text-lg -mt-1">BRIDGE</div>
+                        </div>
+                    </div>
+                    <p class="text-brand-light-bronze max-w-md">
+                        Bridging the gap between your business goals and technology solutions.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="footer-rc-link">Web Development</a></li>
+                        <li><a href="#" class="footer-rc-link">System Integration</a></li>
+                        <li><a href="#" class="footer-rc-link">Technical Support</a></li>
+                        <li><a href="#" class="footer-rc-link">Consulting</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Contact</h3>
+                    <ul class="space-y-2 text-brand-light-bronze">
+                        <li>Email: info@rctechbridge.com</li>
+                        <li>Phone: (555) 123-4567</li>
+                        <li>Address: 123 Tech Street</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-brand-light-bronze mt-8 pt-8 text-center">
+                <p class="text-brand-light-bronze">
+                    © 2025 RC Tech Bridge. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

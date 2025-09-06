@@ -1,0 +1,20 @@
+<svg width="280" height="120" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bridge Structure -->
+  <rect x="20" y="70" width="240" height="8" fill="#CD7F32" rx="4"/>
+  <!-- Bridge Pillars -->
+  <rect x="18" y="40" width="12" height="40" fill="#8B4513" rx="2"/>
+  <rect x="250" y="40" width="12" height="40" fill="#8B4513" rx="2"/>
+  <!-- Bridge Cables -->
+  <line x1="24" y1="40" x2="60" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  <line x1="24" y1="40" x2="100" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  <line x1="24" y1="40" x2="140" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  <line x1="256" y1="40" x2="220" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  <line x1="256" y1="40" x2="180" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  <line x1="256" y1="40" x2="140" y2="70" stroke="#C41E3A" stroke-width="2"/>
+  
+  <!-- RC Letters integrated -->
+  <text x="50" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#8B4513">RC</text>
+  
+  <!-- Company Name -->
+  <text x="140" y="100" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#8B4513" text-anchor="middle">TECH BRIDGE</text>
+</svg>

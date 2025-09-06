@@ -1,0 +1,269 @@
+/* RC Tech Bridge Brand Colors and Styles */
+
+:root {
+  /* Primary Brand Colors */
+  --bronze-primary: #CD7F32;
+  --red-primary: #C41E3A;
+  --white-primary: #FFFFFF;
+  
+  /* Secondary Colors */
+  --bronze-dark: #8B4513;
+  --bronze-light: #DEB887;
+  --red-dark: #8B0000;
+  --off-white: #F8F8FF;
+  
+  /* Typography */
+  --font-primary: 'Montserrat', 'Arial', sans-serif;
+  --font-secondary: 'Open Sans', 'Arial', sans-serif;
+  
+  /* Shadows */
+  --shadow-light: 0 2px 4px rgba(139, 69, 19, 0.1);
+  --shadow-medium: 0 4px 8px rgba(139, 69, 19, 0.15);
+  --shadow-heavy: 0 8px 16px rgba(139, 69, 19, 0.2);
+}
+
+/* Brand Typography */
+.brand-heading {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  color: var(--bronze-dark);
+}
+
+.brand-subheading {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  color: var(--bronze-primary);
+}
+
+.brand-text {
+  font-family: var(--font-secondary);
+  color: var(--bronze-dark);
+  line-height: 1.6;
+}
+
+/* Brand Buttons */
+.btn-primary {
+  background-color: var(--red-primary);
+  color: var(--white-primary);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-primary:hover {
+  background-color: var(--red-dark);
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: var(--bronze-primary);
+  color: var(--white-primary);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bronze-dark);
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--bronze-primary);
+  border: 2px solid var(--bronze-primary);
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  background-color: var(--bronze-primary);
+  color: var(--white-primary);
+  box-shadow: var(--shadow-light);
+}
+
+/* Brand Cards */
+.brand-card {
+  background-color: var(--white-primary);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+  border-left: 4px solid var(--bronze-primary);
+  transition: all 0.3s ease;
+}
+
+.brand-card:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-4px);
+}
+
+.brand-card-header {
+  color: var(--bronze-dark);
+  font-family: var(--font-primary);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Brand Header/Navigation */
+.brand-header {
+  background-color: var(--white-primary);
+  border-bottom: 3px solid var(--bronze-primary);
+  padding: 16px 0;
+  box-shadow: var(--shadow-light);
+}
+
+.brand-nav {
+  background-color: var(--bronze-primary);
+  padding: 12px 0;
+}
+
+.brand-nav a {
+  color: var(--white-primary);
+  text-decoration: none;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.brand-nav a:hover {
+  background-color: var(--bronze-dark);
+}
+
+/* Brand Footer */
+.brand-footer {
+  background-color: var(--bronze-dark);
+  color: var(--white-primary);
+  padding: 40px 0;
+}
+
+.brand-footer h3 {
+  color: var(--bronze-light);
+  font-family: var(--font-primary);
+}
+
+/* Brand Accents */
+.accent-line {
+  height: 3px;
+  background: linear-gradient(90deg, var(--bronze-primary) 0%, var(--red-primary) 100%);
+  border-radius: 2px;
+  margin: 16px 0;
+}
+
+.accent-border {
+  border-left: 4px solid var(--red-primary);
+  padding-left: 16px;
+}
+
+/* Logo Styles */
+.logo-container {
+  display: inline-block;
+}
+
+.logo-primary {
+  height: 60px;
+  width: auto;
+}
+
+.logo-icon {
+  height: 40px;
+  width: 40px;
+}
+
+/* Responsive Logo */
+@media (max-width: 768px) {
+  .logo-primary {
+    height: 48px;
+  }
+  
+  .logo-icon {
+    height: 32px;
+    width: 32px;
+  }
+}
+
+/* Brand Color Classes */
+.bg-bronze { background-color: var(--bronze-primary); }
+.bg-bronze-dark { background-color: var(--bronze-dark); }
+.bg-bronze-light { background-color: var(--bronze-light); }
+.bg-red { background-color: var(--red-primary); }
+.bg-red-dark { background-color: var(--red-dark); }
+
+.text-bronze { color: var(--bronze-primary); }
+.text-bronze-dark { color: var(--bronze-dark); }
+.text-bronze-light { color: var(--bronze-light); }
+.text-red { color: var(--red-primary); }
+.text-red-dark { color: var(--red-dark); }
+.text-white { color: var(--white-primary); }
+
+.border-bronze { border-color: var(--bronze-primary); }
+.border-red { border-color: var(--red-primary); }
+
+/* Utility Classes */
+.shadow-brand { box-shadow: var(--shadow-light); }
+.shadow-brand-medium { box-shadow: var(--shadow-medium); }
+.shadow-brand-heavy { box-shadow: var(--shadow-heavy); }
+
+/* Brand Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Brand Gradients */
+.gradient-bronze-red {
+  background: linear-gradient(135deg, var(--bronze-primary) 0%, var(--red-primary) 100%);
+}
+
+.gradient-bronze-light {
+  background: linear-gradient(135deg, var(--bronze-light) 0%, var(--bronze-primary) 100%);
+}
+
+/* Focus States */
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-outline:focus {
+  outline: 3px solid var(--bronze-light);
+  outline-offset: 2px;
+}
+
+/* Brand Loading Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

@@ -1,0 +1,183 @@
+/* RC Tech Bridge Brand Utilities */
+
+/* Brand Colors as CSS Custom Properties */
+:root {
+  --rc-bronze: #CD7F32;
+  --rc-red: #C41E3A;
+  --rc-dark-bronze: #8B4513;
+  --rc-light-bronze: #DEB887;
+  --rc-deep-red: #8B0000;
+  --rc-white: #FFFFFF;
+  
+  /* RGB values for alpha transparency */
+  --rc-bronze-rgb: 205, 127, 50;
+  --rc-red-rgb: 196, 30, 58;
+  --rc-dark-bronze-rgb: 139, 69, 19;
+  --rc-light-bronze-rgb: 222, 184, 135;
+  --rc-deep-red-rgb: 139, 0, 0;
+}
+
+/* Brand Color Classes */
+.bg-rc-bronze { background-color: var(--rc-bronze); }
+.bg-rc-red { background-color: var(--rc-red); }
+.bg-rc-dark-bronze { background-color: var(--rc-dark-bronze); }
+.bg-rc-light-bronze { background-color: var(--rc-light-bronze); }
+.bg-rc-deep-red { background-color: var(--rc-deep-red); }
+
+.text-rc-bronze { color: var(--rc-bronze); }
+.text-rc-red { color: var(--rc-red); }
+.text-rc-dark-bronze { color: var(--rc-dark-bronze); }
+.text-rc-light-bronze { color: var(--rc-light-bronze); }
+.text-rc-deep-red { color: var(--rc-deep-red); }
+
+.border-rc-bronze { border-color: var(--rc-bronze); }
+.border-rc-red { border-color: var(--rc-red); }
+.border-rc-dark-bronze { border-color: var(--rc-dark-bronze); }
+.border-rc-light-bronze { border-color: var(--rc-light-bronze); }
+.border-rc-deep-red { border-color: var(--rc-deep-red); }
+
+/* Brand Gradients */
+.bg-gradient-rc-bronze {
+  background: linear-gradient(135deg, var(--rc-bronze) 0%, var(--rc-dark-bronze) 100%);
+}
+
+.bg-gradient-rc-red {
+  background: linear-gradient(135deg, var(--rc-red) 0%, var(--rc-deep-red) 100%);
+}
+
+.bg-gradient-rc-brand {
+  background: linear-gradient(135deg, var(--rc-bronze) 0%, var(--rc-red) 100%);
+}
+
+/* Brand Buttons */
+.btn-rc-primary {
+  @apply bg-rc-bronze text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-rc-dark-bronze hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.btn-rc-secondary {
+  @apply bg-rc-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-rc-deep-red hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.btn-rc-outline {
+  @apply border-2 border-rc-bronze text-rc-bronze px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-rc-bronze hover:text-white;
+}
+
+/* Brand Cards */
+.card-rc {
+  @apply bg-white rounded-lg shadow-lg p-6 border-l-4 border-rc-bronze transition-all duration-300 hover:shadow-xl hover:border-rc-red;
+}
+
+/* Brand Shadows */
+.shadow-rc {
+  box-shadow: 0 4px 6px -1px rgba(var(--rc-bronze-rgb), 0.1), 0 2px 4px -1px rgba(var(--rc-bronze-rgb), 0.06);
+}
+
+.shadow-rc-lg {
+  box-shadow: 0 10px 15px -3px rgba(var(--rc-bronze-rgb), 0.1), 0 4px 6px -2px rgba(var(--rc-bronze-rgb), 0.05);
+}
+
+/* Logo Styles */
+.rc-logo-container {
+  @apply inline-flex items-center space-x-2;
+}
+
+.rc-logo-text {
+  @apply text-rc-bronze font-bold text-2xl;
+}
+
+.rc-logo-bridge {
+  @apply w-8 h-1 bg-rc-red rounded-full;
+}
+
+.rc-logo-subtext {
+  @apply text-rc-red font-semibold text-sm tracking-wider uppercase;
+}
+
+/* Brand Animations */
+@keyframes rc-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rc-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-rc-fade-in {
+  animation: rc-fade-in 0.6s ease-out;
+}
+
+.animate-rc-pulse {
+  animation: rc-pulse 2s infinite;
+}
+
+/* Brand Typography */
+.heading-rc {
+  @apply text-rc-bronze font-bold leading-tight;
+}
+
+.subheading-rc {
+  @apply text-rc-red font-semibold;
+}
+
+/* Brand Alerts */
+.alert-rc-success {
+  @apply bg-green-50 border-l-4 border-green-400 p-4 text-green-700;
+}
+
+.alert-rc-warning {
+  @apply bg-yellow-50 border-l-4 border-rc-bronze p-4 text-rc-dark-bronze;
+}
+
+.alert-rc-error {
+  @apply bg-red-50 border-l-4 border-rc-red p-4 text-rc-deep-red;
+}
+
+/* Responsive Logo Classes */
+.rc-logo-sm {
+  @apply text-lg;
+}
+
+.rc-logo-md {
+  @apply text-2xl;
+}
+
+.rc-logo-lg {
+  @apply text-4xl;
+}
+
+.rc-logo-xl {
+  @apply text-6xl;
+}
+
+/* Navigation Brand Styles */
+.nav-rc {
+  @apply bg-white shadow-rc border-b border-rc-light-bronze;
+}
+
+.nav-rc-item {
+  @apply text-gray-700 hover:text-rc-bronze transition-colors duration-200 font-medium;
+}
+
+.nav-rc-active {
+  @apply text-rc-bronze border-b-2 border-rc-bronze;
+}
+
+/* Form Brand Styles */
+.input-rc {
+  @apply border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rc-bronze focus:border-rc-bronze transition-all duration-200;
+}
+
+.select-rc {
+  @apply border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-rc-bronze focus:border-rc-bronze transition-all duration-200;
+}
+
+/* Brand Footer */
+.footer-rc {
+  @apply bg-rc-dark-bronze text-white;
+}
+
+.footer-rc-link {
+  @apply text-rc-light-bronze hover:text-white transition-colors duration-200;
+}

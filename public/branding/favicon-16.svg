@@ -1,0 +1,16 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="16" height="16" fill="#CD7F32" rx="2"/>
+  
+  <!-- Bridge structure simplified -->
+  <rect x="2" y="9" width="12" height="1" fill="white"/>
+  
+  <!-- RC letters -->
+  <text x="8" y="11" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="white" text-anchor="middle">RC</text>
+  
+  <!-- Bridge cables -->
+  <line x1="4" y1="4" x2="6" y2="9" stroke="#C41E3A" stroke-width="0.5"/>
+  <line x1="4" y1="4" x2="10" y2="9" stroke="#C41E3A" stroke-width="0.5"/>
+  <line x1="12" y1="4" x2="10" y2="9" stroke="#C41E3A" stroke-width="0.5"/>
+  <line x1="12" y1="4" x2="6" y2="9" stroke="#C41E3A" stroke-width="0.5"/>
+</svg>

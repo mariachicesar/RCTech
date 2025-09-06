@@ -1,0 +1,20 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient background for iOS -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="180" height="180" fill="url(#bgGradient)" rx="36"/>
+  
+  <!-- R and C with bridge -->
+  <text x="45" y="100" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white">R</text>
+  <rect x="85" y="85" width="20" height="4" fill="#C41E3A"/>
+  <text x="115" y="100" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white">C</text>
+  
+  <!-- Tech Bridge text -->
+  <text x="90" y="130" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle" letter-spacing="1px">TECH BRIDGE</text>
+</svg>
