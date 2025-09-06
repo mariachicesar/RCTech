@@ -4,7 +4,6 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { type MDXEditorMethods } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 
-import MultipleFileInputExample from "@/components/form/form-elements/MultipleFileInputExample";
 import ComponentCard from "@/components/common/ComponentCard";
 import Button from "@/components/ui/button/Button";
 import SeoMetadata from "@/components/form/form-elements/SeoMetadata";
@@ -33,7 +32,6 @@ export default function FormMain() {
   // State
   const [showCreationWizard, setShowCreationWizard] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [resetTrigger, setResetTrigger] = useState(0);
   const [viewMode, setViewMode] = useState<'organizer' | 'editor'>('organizer');
   
   // Refs
@@ -46,7 +44,6 @@ export default function FormMain() {
     selectedPage,
     seoData,
     content,
-    imageUploadLocation,
     mainNavPages,
     servicePages,
     blogPosts,
@@ -75,14 +72,6 @@ export default function FormMain() {
   }, [seoData, selectedPage, updateFormData]);
 
   // Handlers
-  const handleGetMarkdown = useCallback(() => {
-    setContent(editorRef.current?.getMarkdown() ?? "");
-  }, [setContent]);
-
-  const handleFocusEditor = useCallback(() => {
-    editorRef.current?.focus();
-  }, []);
-
   const handleCreatePage = useCallback(() => {
     setShowCreationWizard(true);
     setViewMode('editor');
@@ -126,7 +115,6 @@ export default function FormMain() {
     resetForm();
     setContent("");
     setShowAlert(true);
-    setResetTrigger(prev => prev + 1);
     
     if (editorRef.current) {
       editorRef.current.setMarkdown(DEFAULT_MARKDOWN);
@@ -145,7 +133,6 @@ export default function FormMain() {
   }, [validateAllFields, content, savePage, formData, selectedClient?.website_id, errors]);
 
   const shouldShowSeoMetadata = showCreationWizard || !!seoData;
-  const editorMarkdown = selectedPage?.content || DEFAULT_MARKDOWN;
 
   return (
     <div>
@@ -191,7 +178,7 @@ export default function FormMain() {
           selectedPageId={selectedPage?.id}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className={`grid grid-cols-1 gap-6 ${!showCreationWizard ? 'xl:grid-cols-2' : ''}`}>
           <div className="space-y-6">
             <ComponentCard title="Page Management">
               <div className="space-y-6">
@@ -236,51 +223,51 @@ export default function FormMain() {
             </ComponentCard>
           </div>
 
-          <div className="space-y-6">
-            <ComponentCard title="Content Editor">
-              {selectedPage ? (
-                <div className="border rounded-lg overflow-hidden">
-                  <EditorSection
-                    editorRef={editorRef}
-                    markdown={selectedPage.content || ""}
-                    showControls={false}
-                  />
-                </div>
-              ) : !showCreationWizard ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p>Select a page from the organizer or create a new page to start editing</p>
-                </div>
-              ) : (
-                <>
-                  <EditorSection
-                    editorRef={editorRef}
-                    markdown={editorMarkdown}
-                    onGetMarkdown={handleGetMarkdown}
-                    onFocusEditor={handleFocusEditor}
-                  />
-                  
-                  <div className="space-y-6 mt-6">
-                    <MultipleFileInputExample
-                      imageUploadLocation={imageUploadLocation}
-                      resetTrigger={resetTrigger}
-                      idFieldName="page_id"
+          {!showCreationWizard && (
+            <div className="space-y-6">
+              <ComponentCard title="Content Editor">
+                {selectedPage ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <EditorSection
+                      editorRef={editorRef}
+                      markdown={selectedPage.content || ""}
+                      showControls={false}
                     />
                   </div>
-                </>
-              )}
-            </ComponentCard>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="mb-4">Select a page from the organizer or create a new page to start editing</p>
+                    <div className="flex gap-3 justify-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setViewMode('organizer')}
+                      >
+                        Go to Page Organizer
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleCreatePage}
+                      >
+                        Create New Page
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </ComponentCard>
 
-            {(selectedPage || showCreationWizard) && !showCreationWizard && (
-              <Button 
-                size="sm" 
-                className="bg-green-500" 
-                onClick={handleSavePage} 
-                disabled={selectedClient?.id === 0}
-              >
-                Save Page
-              </Button>
-            )}
-          </div>
+              {selectedPage && (
+                <Button 
+                  size="sm" 
+                  className="bg-green-500" 
+                  onClick={handleSavePage} 
+                  disabled={selectedClient?.id === 0}
+                >
+                  Save Page
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
