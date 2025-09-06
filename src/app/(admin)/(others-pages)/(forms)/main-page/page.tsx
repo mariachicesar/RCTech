@@ -89,13 +89,11 @@ export default function FormMain() {
   }, []);
 
   const handleCreatePageSubmit = useCallback(async (data: PageCreationData & { content?: string }) => {
-    console.log('handleCreatePageSubmit called with:', data);
     try {
       const result = await createNewPage(data);
-      console.log('createNewPage result:', result);
       
       if (result?.response) {
-        setShowCreationWizard(false);
+        // Don't hide creation wizard immediately - let PageCreationWithImages handle its own lifecycle
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);
         
@@ -104,7 +102,7 @@ export default function FormMain() {
           setViewMode('editor');
         }
         
-        return result; // Return the result for image upload handling
+        return result;
       } else {
         console.error('Failed to create page - no response:', result);
         return result;

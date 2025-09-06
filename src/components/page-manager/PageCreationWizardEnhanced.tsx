@@ -45,7 +45,7 @@ interface PageCreationWizardProps {
   onCreatePage: (data: PageCreationData & { content?: string }) => void;
   onCancel: () => void;
   isLoading?: boolean;
-  enableAIContent?: boolean; // New prop to enable AI content generation
+  enableAIContent?: boolean;
 }
 
 const pageTypeOptions = [
@@ -122,6 +122,9 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
     template_type: 'standard',
     is_main_nav: false,
   });
+
+  // State management
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // AI Content Generation state
   const [aiFormData, setAiFormData] = useState({
@@ -288,21 +291,42 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
   const canProceedToStep2 = formData.page_type && formData.template_type;
   const canSubmit = formData.title && formData.slug && canProceedToStep2;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (canSubmit && formData.page_type && formData.template_type && formData.title && formData.slug) {
-      const pageData: PageCreationData = {
-        page_type: formData.page_type,
-        template_type: formData.template_type,
-        title: formData.title,
-        slug: formData.slug,
-        parent_id: formData.parent_id || null,
-        is_main_nav: formData.is_main_nav || false,
-        meta_description: formData.meta_description,
-        meta_keywords: formData.meta_keywords,
-        content: selectedContent || undefined, // Add AI-generated content if available
-      };
+      setIsSubmitting(true);
       
-      onCreatePage(pageData);
+      try {
+        const pageData: PageCreationData = {
+          page_type: formData.page_type,
+          template_type: formData.template_type,
+          title: formData.title,
+          slug: formData.slug,
+          parent_id: formData.parent_id || null,
+          is_main_nav: formData.is_main_nav || false,
+          meta_description: formData.meta_description,
+          meta_keywords: formData.meta_keywords,
+          content: selectedContent || undefined, // Add AI-generated content if available
+        };
+
+        // Call the original onCreatePage handler
+        await onCreatePage(pageData);
+      } catch (error) {
+        console.error('Error in handleSubmit:', error);
+        // Fallback to original behavior on error
+        await onCreatePage({
+          page_type: formData.page_type!,
+          template_type: formData.template_type!,
+          title: formData.title!,
+          slug: formData.slug!,
+          parent_id: formData.parent_id || null,
+          is_main_nav: formData.is_main_nav || false,
+          meta_description: formData.meta_description,
+          meta_keywords: formData.meta_keywords,
+          content: selectedContent || undefined,
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -532,9 +556,9 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
               Cancel
             </Button>
             <Button 
-              onClick={() => setStep(3)}
+              onClick={() => setStep(enableAIContent ? 3 : 2)}
             >
-              {selectedContent ? 'Review & Finalize' : 'Skip AI Content'}
+              {selectedContent ? 'Next: Review' : 'Review & Finalize'}
             </Button>
           </div>
         </div>
@@ -639,9 +663,9 @@ const PageCreationWizard: React.FC<PageCreationWizardProps> = ({
             </Button>
             <Button 
               onClick={handleSubmit} 
-              disabled={!canSubmit || isLoading}
+              disabled={!canSubmit || isLoading || isSubmitting}
             >
-              {isLoading ? 'Creating...' : 'Create Page'}
+              {isLoading || isSubmitting ? 'Creating...' : 'Create Page'}
             </Button>
           </div>
         </div>

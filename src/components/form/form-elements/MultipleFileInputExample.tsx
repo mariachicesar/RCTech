@@ -57,7 +57,6 @@ export default forwardRef<MultipleFileInputRef, {
       return;
     }
 
-    // Filter images that have been uploaded
     const uploadedImages = images.filter(img => img.uploadedUrl);
     
     if (uploadedImages.length === 0) {
@@ -71,10 +70,6 @@ export default forwardRef<MultipleFileInputRef, {
       caption: img.caption || null,
     }));
 
-    console.log('Attempting to save images:', imagePayload);
-    console.log('Image upload location:', imageUploadLocation);
-    console.log('ID field name:', idFieldName);
-
     try {
       // Step 1: Create image entries
       const imageResponse = await mutateUpdate({
@@ -86,10 +81,7 @@ export default forwardRef<MultipleFileInputRef, {
         },
       });
       
-      console.log("Image creation response:", imageResponse);
-      
       if (imageResponse.error) {
-        console.error("Error saving images:", imageResponse.error);
         throw new Error(`Failed to create images: ${imageResponse.error}`);
       }
       
@@ -101,29 +93,20 @@ export default forwardRef<MultipleFileInputRef, {
           image_id: img.id,
         }));
 
-        console.log('Creating page-image relationships:', relationshipPayload);
-
         const relationshipResponse = await mutateUpdate({
           path: imageUploadLocation.table,
           method: "POST",
           payload: relationshipPayload,
         });
         
-        console.log("Relationship creation response:", relationshipResponse);
-        
         if (relationshipResponse.error) {
-          console.error("Error creating relationships:", relationshipResponse.error);
           throw new Error(`Failed to create page-image relationships: ${relationshipResponse.error}`);
         }
-        
-        console.log('✅ Successfully created images and relationships');
       } else {
-        console.error('Unexpected image response format:', imageResponse.response);
         throw new Error('Invalid response format from image creation');
       }
     } catch (error) {
-      console.error('Complete image save operation failed:', error);
-      // Re-throw to let parent components handle the error
+      console.error('Image save operation failed:', error);
       throw error;
     }
   }, [images, imageUploadLocation, idFieldName]);
@@ -233,21 +216,34 @@ export default forwardRef<MultipleFileInputRef, {
     const compressionTarget = targetSize - exifOverhead;
 
     let quality = 0.8;
-    let compressed: File = await imageCompressor(file, quality) as File;
+    let compressed: File | null = await imageCompressor(file, quality) as File | null;
+
+    // Handle case where compression fails
+    if (!compressed) {
+      console.warn('Image compression failed, using original file');
+      return file;
+    }
 
     if (compressed.size <= compressionTarget) {
       return compressed;
     }
 
-    while (compressed.size > compressionTarget && quality > 0.1) {
+    while (compressed && compressed.size > compressionTarget && quality > 0.1) {
       const sizeRatio = compressed.size / compressionTarget;
       const qualityStep = sizeRatio > 2 ? 0.2 : 0.1;
 
       quality = Math.max(0.1, quality - qualityStep);
-      compressed = await imageCompressor(file, quality) as File;
+      const newCompressed = await imageCompressor(file, quality) as File | null;
+      
+      if (!newCompressed) {
+        console.warn('Image compression failed at quality', quality, 'using previous result');
+        break;
+      }
+      
+      compressed = newCompressed;
     }
 
-    return compressed;
+    return compressed || file; // Fallback to original file if compression completely fails
   };
 
   const handleFileChange = async (imageId: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -281,8 +277,6 @@ export default forwardRef<MultipleFileInputRef, {
           uploading: false
         } : img
       ));
-
-      console.log(`Image ${imageId} processed and uploaded successfully to:`, url);
     } catch (error) {
       console.error(`Error processing image ${imageId}:`, error);
       // Reset uploading state on error

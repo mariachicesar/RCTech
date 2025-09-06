@@ -4,7 +4,7 @@ import { fetcher } from './fetcher';
 // Define the type for the user table in the Database
 type UpdateType = {
     path: string | null;
-    method: 'PATCH' | 'PUT' | 'POST' | 'DELETE';
+    method: 'PATCH' | 'PUT' | 'POST' | 'DELETE' | 'GET';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any;
     mutateKey?: string;

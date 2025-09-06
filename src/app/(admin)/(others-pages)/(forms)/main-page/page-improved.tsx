@@ -10,7 +10,7 @@ import Button from "@/components/ui/button/Button";
 import SeoMetadata from "@/components/form/form-elements/SeoMetadata";
 import Alert from "@/components/ui/alert/Alert";
 import PageOrganizer from "@/components/page-manager/PageOrganizer";
-import PageCreationWizard from "@/components/page-manager/PageCreationWizard";
+import PageCreationWizard from "@/components/page-manager/PageCreationWithImages";
 import EditorSection from "@/components/page-manager/EditorSection";
 
 import { useSidebar } from "@/context/SidebarContext";
@@ -151,13 +151,13 @@ export default function FormMain() {
       {/* View Toggle */}
       <div className="mb-6 flex gap-4">
         <Button
-          variant={viewMode === 'organizer' ? 'primary' : 'secondary'}
+          variant={viewMode === 'organizer' ? 'primary' : 'outline'}
           onClick={() => setViewMode('organizer')}
         >
           Page Organizer
         </Button>
         <Button
-          variant={viewMode === 'editor' ? 'primary' : 'secondary'}
+          variant={viewMode === 'editor' ? 'primary' : 'outline'}
           onClick={() => setViewMode('editor')}
         >
           Page Editor
@@ -200,7 +200,7 @@ export default function FormMain() {
                       </Button>
                       <Button
                         size="sm"
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => setViewMode('organizer')}
                       >
                         Back to Organizer

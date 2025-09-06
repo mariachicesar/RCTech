@@ -23,17 +23,23 @@ const PageCreationWithImages: React.FC<PageCreationWithImagesProps> = ({
 
   const handlePageCreation = useCallback(async (data: PageCreationData) => {
     try {
-      // Create the page first
       const result = await onCreatePage(data);
-      console.log('Page creation result:', result);
       
       // Extract page ID from the result
       let pageId: number | null = null;
       
-      // Handle different possible response structures
       if (result && typeof result === 'object') {
         const resultObj = result as Record<string, unknown>;
-        if (resultObj.response && typeof resultObj.response === 'object') {
+        
+        // Check if response is an array with page objects
+        if (Array.isArray(resultObj.response) && resultObj.response.length > 0) {
+          const firstItem = resultObj.response[0] as Record<string, unknown>;
+          if (typeof firstItem.id === 'number') {
+            pageId = firstItem.id;
+          }
+        }
+        // Check other possible response structures
+        else if (resultObj.response && typeof resultObj.response === 'object') {
           const response = resultObj.response as Record<string, unknown>;
           if (response.page && typeof response.page === 'object') {
             const page = response.page as Record<string, unknown>;
@@ -41,27 +47,24 @@ const PageCreationWithImages: React.FC<PageCreationWithImagesProps> = ({
               pageId = page.id;
             }
           }
-        } else if (Array.isArray(resultObj.response) && resultObj.response[0]) {
-          const firstItem = resultObj.response[0] as Record<string, unknown>;
-          if (typeof firstItem.id === 'number') {
-            pageId = firstItem.id;
-          }
-        } else if (resultObj.page && typeof resultObj.page === 'object') {
+        }
+        else if (resultObj.page && typeof resultObj.page === 'object') {
           const page = resultObj.page as Record<string, unknown>;
           if (typeof page.id === 'number') {
             pageId = page.id;
           }
+        }
+        else if (typeof resultObj.id === 'number') {
+          pageId = resultObj.id;
         }
       }
       
       if (pageId) {
         setCreatedPageId(pageId);
         setShowImageUpload(true);
-        return result;
-      } else {
-        console.error('Could not extract page ID from result:', result);
-        return result;
       }
+      
+      return result;
     } catch (error) {
       console.error('Error creating page:', error);
       throw error;
@@ -74,16 +77,18 @@ const PageCreationWithImages: React.FC<PageCreationWithImagesProps> = ({
         await imageUploadRef.current.handleSaveImages();
         setShowImageUpload(false);
         setCreatedPageId(null);
+        onCancel();
       } catch (error) {
         console.error('Error uploading images:', error);
       }
     }
-  }, [createdPageId]);
+  }, [createdPageId, onCancel]);
 
   const handleSkipImages = useCallback(() => {
     setShowImageUpload(false);
     setCreatedPageId(null);
-  }, []);
+    onCancel();
+  }, [onCancel]);
 
   if (showImageUpload && createdPageId) {
     return (
