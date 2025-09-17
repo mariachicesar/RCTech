@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     // Helps with client component bundling
     optimizePackageImports: ['@mdxeditor/editor'],
   },
+  // Fix for client reference manifest issues
+  serverExternalPackages: [],
   images: {
     remotePatterns: [
       {
