@@ -5,9 +5,14 @@ const nextConfig: NextConfig = {
   experimental: {
     // Helps with client component bundling
     optimizePackageImports: ['@mdxeditor/editor'],
+    // Fix for client reference manifest issues
+    optimizeCss: false,
+    serverComponentsExternalPackages: [],
   },
   // Fix for client reference manifest issues
   serverExternalPackages: [],
+  // Ensure proper bundling
+  bundlePagesRouterDependencies: true,
   images: {
     remotePatterns: [
       {
@@ -23,6 +28,20 @@ const nextConfig: NextConfig = {
       test: /\.svg$/,
       use: ["@svgr/webpack"],
     });
+    
+    // Fix for client reference manifest issues
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        ...config.optimization?.splitChunks,
+        cacheGroups: {
+          ...config.optimization?.splitChunks?.cacheGroups,
+          default: false,
+          vendors: false,
+        },
+      },
+    };
+    
     return config;
   },
 };
