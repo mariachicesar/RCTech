@@ -61,7 +61,7 @@ export default function AdminLayout({
       ) : (
         <>
           <div className="flex flex-col items-center justify-center h-screen">
-            <Button className="w-40" size="sm" onClick={() => router.push("/signin")}>
+            <Button className="w-40" size="sm" onClick={() => router.push("/signin?next=/admin")}>
               Sign in
             </Button>
           </div>

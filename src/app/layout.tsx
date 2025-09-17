@@ -10,6 +10,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  // Used to resolve absolute URLs for OpenGraph/Twitter images in production
+  // Update to your production domain as needed
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rctechbridge.com'),
   title: 'RC Tech Bridge - Bridging Business & Technology',
   description: 'Focus on growing your business while we handle all the technical obstacles. RC Tech Bridge provides seamless technology solutions that work behind the scenes.',
   keywords: 'technology solutions, web development, business automation, technical support, small business tech',
