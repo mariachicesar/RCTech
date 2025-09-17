@@ -2,7 +2,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import { Post } from "../../app/(admin)/(others-pages)/google-business/page";
+import type { Post } from "@/types/googleBusiness";
 
 export function CreatePostModal({ clientName, onClose, onCreatePost }: {
     clientName: string;

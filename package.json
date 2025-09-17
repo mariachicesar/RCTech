@@ -2,6 +2,9 @@
   "name": "free-nextjs-admin-dashboard",
   "version": "2.0.2",
   "private": true,
+  "engines": {
+    "node": ">=20 <21"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -28,16 +31,16 @@
     "autoprefixer": "^10.4.20",
     "flatpickr": "^4.6.13",
     "googleapis": "^155.0.0",
-    "next": "15.2.3",
+    "next": "15.1.0",
     "next-s3-upload": "^0.3.4",
     "openai": "^5.16.0",
     "piexifjs": "^1.0.6",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "react": "^19.0.0",
+    "react": "^18.3.1",
     "react-apexcharts": "^1.7.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "^19.0.0",
+    "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",
     "swiper": "^11.2.0",
     "swr": "^2.3.4",
@@ -48,15 +51,15 @@
     "@eslint/eslintrc": "^3",
     "@svgr/webpack": "^8.1.0",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/react-transition-group": "^4.4.12",
     "eslint": "^9",
     "eslint-config-next": "15.1.3",
     "postcss": "^8",
     "supabase": "^2.33.9",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   },
   "overrides": {
     "@react-jvectormap/core": {

@@ -45,7 +45,7 @@ const Navbar = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             <Link 
-              href="/signin"
+              href="/signin?next=/admin"
               className="text-[#CD7F32] border border-[#CD7F32] px-4 py-2 rounded-lg font-semibold hover:bg-[#CD7F32] hover:text-white transition-all duration-300"
             >
               Admin Login
@@ -123,7 +123,7 @@ const Navbar = () => {
               </Link>
               <div className="px-3 py-2 space-y-2">
                 <Link 
-                  href="/signin"
+                  href="/signin?next=/admin"
                   className="block w-full text-center border border-[#CD7F32] text-[#CD7F32] px-4 py-2 rounded-lg font-semibold hover:bg-[#CD7F32] hover:text-white transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >

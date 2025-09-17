@@ -1,10 +1,19 @@
 import type { NextConfig } from "next";
 
+// Minimal, stable Next.js 15 config. Avoids custom chunking that can break
+// client-reference manifests and route transitions. See docs:
+// https://nextjs.org/docs/app/building-your-application/configuring
 const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    // Helps with client component bundling
-    optimizePackageImports: ['@mdxeditor/editor'],
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
+      },
+    ];
   },
   images: {
     remotePatterns: [
@@ -13,13 +22,33 @@ const nextConfig: NextConfig = {
         hostname: "techconsulting-rc.s3.us-west-1.amazonaws.com",
         port: "",
         pathname: "/**",
-      }
+      },
     ],
   },
   webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
+    // High-priority SVGR loader for all SVG imports
+    // This transforms `import Icon from './icon.svg'` into a React component
+    // and avoids the default JS parser trying to parse raw SVG.
+    // Insert at the very beginning for precedence.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (config.module.rules as any[]).unshift({
+      test: /\.svg$/i,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            svgo: true,
+            svgoConfig: {
+              plugins: [
+                {
+                  name: "preset-default",
+                  params: { overrides: { removeViewBox: false } },
+                },
+              ],
+            },
+          },
+        },
+      ],
     });
     return config;
   },
