@@ -7,10 +7,12 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../superbase-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextDest = searchParams.get('next') || '/admin';
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,8 @@ export default function SignInForm() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         saveGoogleTokens(session);
-        router.push('/');
+  // If already authenticated, go straight to destination
+  router.push(nextDest);
       }
     };
 
@@ -36,8 +39,8 @@ export default function SignInForm() {
       if (event === 'SIGNED_IN' && session) {
         // Save Google tokens if available
         saveGoogleTokens(session);
-        // Redirect to dashboard after successful login
-        router.push('/');
+  // Redirect to destination after successful login
+  router.push(nextDest);
       }
       
       if (event === 'TOKEN_REFRESHED' && session) {
@@ -47,7 +50,7 @@ export default function SignInForm() {
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, nextDest]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const saveGoogleTokens = async (session: any) => {
@@ -88,7 +91,7 @@ export default function SignInForm() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/");
+      router.push(nextDest);
     }
     setIsLoading(false);
   };
@@ -97,7 +100,8 @@ export default function SignInForm() {
     setIsGoogleLoading(true);
     setError(null);
 
-    const redirectUrl = `${window.location.origin}/auth/callback-handler`;
+  // Prefer server-side callback to exchange code and set cookies, then redirect to destination
+  const redirectUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextDest)}`;
     console.log('Using redirect URL:', redirectUrl);
 
     const { error } = await supabase.auth.signInWithOAuth({
