@@ -1,9 +1,17 @@
 import OpenAI from "openai";
 import z from "zod";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Ensure this route is always dynamic and runs on Node.js runtime
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing OPENAI_API_KEY. Set it in your environment to use /api/content-agent.");
+  }
+  return new OpenAI({ apiKey });
+}
 
 //Prompt Chaining Steps
 /*
@@ -41,7 +49,7 @@ const Metadata = z.object({
 //Define the functions/tools
 const generateContentIdeas = async ({ city, industry, keyword }: { city: string, industry: string, keyword: string }) => {
   // Call OpenAI API to generate content ideas
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       { role: "user", content: `I am a content creator assistant. Here is my competitor's site: My company is in the ${industry} industry. Help me create 3 ideas to rank for the keyword "${keyword}" in ${city}.` }
@@ -87,7 +95,7 @@ const analyzeCompetitorGaps = async ({
   competitor1Url: string
 }) => {
   // Call OpenAI API to analyze competitor gaps
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       { 
@@ -137,7 +145,7 @@ Analyze potential gaps and opportunities. Provide target keywords, titles, and s
 
 const createContentOutline = async ({ userChosenIdea }: { userChosenIdea: string }) => {
   // Call OpenAI API to create content outline
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       { role: "user", content: `Create a detailed content outline for the following idea: ${userChosenIdea}. Include appropriate H1, H2, H3 headings, key points to cover, and SEO best practices.` }
@@ -170,7 +178,7 @@ const writeMarkdownContent = async ({ outline, userChosenIdea, city, industry, k
   keyword: string 
 }) => {
   // Call OpenAI API to write the full markdown content
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       { 
@@ -222,7 +230,7 @@ Focus on providing real value to readers while naturally incorporating the targe
 
 const generateMetadata = async ({ content }: { content: string }) => {
   // Call OpenAI API to generate metadata
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       { role: "user", content: `Generate SEO metadata for the following content: ${content}.` }
@@ -254,6 +262,12 @@ const generateMetadata = async ({ content }: { content: string }) => {
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return new Response(JSON.stringify({
+        error: "OPENAI_API_KEY is not set. Add it to your environment to use this endpoint.",
+      }), { status: 500 });
+    }
+
     const { ourUrl, city, industry, keyword, competitor1Url, service, userChosenIdea, content } = await request.json();
     console.log("Request Data:", { ourUrl, city, industry, keyword, competitor1Url, service, userChosenIdea, content });
     
