@@ -7,10 +7,12 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../superbase-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextDest = searchParams.get('next') || '/admin';
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,8 @@ export default function SignInForm() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         saveGoogleTokens(session);
-        router.push('/');
+  // If already authenticated, go straight to destination
+  router.push(nextDest);
       }
     };
 
@@ -36,8 +39,8 @@ export default function SignInForm() {
       if (event === 'SIGNED_IN' && session) {
         // Save Google tokens if available
         saveGoogleTokens(session);
-        // Redirect to dashboard after successful login
-        router.push('/');
+  // Redirect to destination after successful login
+  router.push(nextDest);
       }
       
       if (event === 'TOKEN_REFRESHED' && session) {
@@ -47,7 +50,7 @@ export default function SignInForm() {
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, nextDest]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const saveGoogleTokens = async (session: any) => {
@@ -88,7 +91,7 @@ export default function SignInForm() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/");
+      router.push(nextDest);
     }
     setIsLoading(false);
   };
@@ -97,7 +100,8 @@ export default function SignInForm() {
     setIsGoogleLoading(true);
     setError(null);
 
-    const redirectUrl = `${window.location.origin}/auth/callback-handler`;
+  // Prefer server-side callback to exchange code and set cookies, then redirect to destination
+  const redirectUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextDest)}`;
     console.log('Using redirect URL:', redirectUrl);
 
     const { error } = await supabase.auth.signInWithOAuth({
@@ -128,7 +132,7 @@ export default function SignInForm() {
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
         <Link
           href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-[#CD7F32] dark:text-gray-400 dark:hover:text-[#CD7F32]"
         >
           <ChevronLeftIcon />
           Back to dashboard
@@ -137,11 +141,25 @@ export default function SignInForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+            {/* Brand Logo */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1">
+                  <span className="text-3xl font-bold text-[#CD7F32]">R</span>
+                  <div className="w-8 h-0.5 bg-[#C41E3A] rounded-full"></div>
+                  <span className="text-3xl font-bold text-[#CD7F32]">C</span>
+                </div>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-[#CD7F32] font-bold text-base tracking-wide">TECH</span>
+                  <span className="text-[#C41E3A] font-bold text-base tracking-wide -mt-1">BRIDGE</span>
+                </div>
+              </div>
+            </div>
+            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md text-center">
+              Admin Sign In
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              Enter your credentials to access the admin dashboard
             </p>
           </div>
           <div>
@@ -149,7 +167,7 @@ export default function SignInForm() {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading}
-                className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-[#CD7F32]/10 hover:text-[#CD7F32] hover:border-[#CD7F32]/20 border border-transparent dark:bg-white/5 dark:text-white/90 dark:hover:bg-[#CD7F32]/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGoogleLoading ? (
                   <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
@@ -181,7 +199,7 @@ export default function SignInForm() {
                 )}
                 {isGoogleLoading ? "Signing in..." : "Sign in with Google"}
               </button>
-              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-[#CD7F32]/10 hover:text-[#CD7F32] hover:border-[#CD7F32]/20 border border-transparent dark:bg-white/5 dark:text-white/90 dark:hover:bg-[#CD7F32]/10">
                 <svg
                   width="21"
                   className="fill-current"
@@ -207,20 +225,20 @@ export default function SignInForm() {
             </div>
             <form onSubmit={handleSubmit}>
               {error && (
-                <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/10 dark:border-red-800 dark:text-red-400">
+                <div className="mb-4 p-3 text-sm text-[#C41E3A] bg-[#C41E3A]/5 border border-[#C41E3A]/20 rounded-lg dark:bg-[#C41E3A]/10 dark:border-[#C41E3A]/30">
                   {error}
                 </div>
               )}
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{" "}
+                    Email <span className="text-[#C41E3A]">*</span>{" "}
                   </Label>
                   <Input placeholder="info@gmail.com" type="email" name="email" />
                 </div>
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>{" "}
+                    Password <span className="text-[#C41E3A]">*</span>{" "}
                   </Label>
                   <div className="relative">
                     <Input
@@ -249,13 +267,18 @@ export default function SignInForm() {
                   </div>
                   <Link
                     href="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                    className="text-sm text-[#CD7F32] hover:text-[#8B4513] transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm" type="submit" disabled={isLoading}>
+                  <Button 
+                    className="w-full bg-[#CD7F32] hover:bg-[#8B4513] disabled:bg-[#CD7F32]/50 border-0 shadow-sm" 
+                    size="sm" 
+                    type="submit" 
+                    disabled={isLoading}
+                  >
                     {isLoading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
@@ -267,7 +290,7 @@ export default function SignInForm() {
                 Don&apos;t have an account? {""}
                 <Link
                   href="/signup"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                  className="text-[#CD7F32] hover:text-[#8B4513] transition-colors font-medium"
                 >
                   Sign Up
                 </Link>

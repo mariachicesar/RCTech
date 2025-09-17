@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
@@ -17,22 +16,7 @@ interface OAuthStatus {
     message: string;
 }
 
-export interface Post {
-    id: number;
-    topicType: string;
-    languageCode: string;
-    summary: string;
-    callToAction: {
-        actionType: string;
-        url: string;
-    };
-    media: any[];
-    event: any;
-    offer: any;
-    product: any;
-    scheduleTime: string;
-    alertType: string;
-}
+import type { Post } from "@/types/googleBusiness";
 
 export default function GoogleBusinessPage() {
     const { selectedClient } = useSidebar();

@@ -4,7 +4,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../superbase-client";
 import Button from "../../components/ui/button/Button";
 import { useRouter } from "next/navigation";
@@ -22,15 +22,15 @@ export default function AdminLayout({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [session, setSession] = useState<any>(null)
 
-  const fetchSession = async () => {
+  const fetchSession = useCallback(async () => {
     const currentSession = await supabase.auth.getSession()
     setSession(currentSession.data.session)
     setActiveUser(currentSession.data.session?.user || null)
-  }
+  }, [setActiveUser])
 
   useEffect(() => {
     fetchSession()
-  }, [])
+  }, [fetchSession])
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
@@ -61,7 +61,7 @@ export default function AdminLayout({
       ) : (
         <>
           <div className="flex flex-col items-center justify-center h-screen">
-            <Button className="w-40" size="sm" onClick={() => router.push("/signin")}>
+            <Button className="w-40" size="sm" onClick={() => router.push("/signin?next=/admin")}>
               Sign in
             </Button>
           </div>

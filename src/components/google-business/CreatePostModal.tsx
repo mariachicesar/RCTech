@@ -2,7 +2,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import { Post } from "../../app/(admin)/(others-pages)/google-business/page";
+import type { Post } from "@/types/googleBusiness";
 
 export function CreatePostModal({ clientName, onClose, onCreatePost }: {
     clientName: string;
@@ -269,6 +269,8 @@ export function CreatePostModal({ clientName, onClose, onCreatePost }: {
                                                 <Image
                                                     src={media.sourceUrl}
                                                     alt={media.name}
+                                                    width={80}
+                                                    height={80}
                                                     className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600" />
                                                 <button
                                                     onClick={() => removeMedia(post.id, media.id)}

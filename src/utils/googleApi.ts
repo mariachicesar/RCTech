@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Post } from "../app/(admin)/(others-pages)/google-business/page";
+import type { Post } from "@/types/googleBusiness";
 import { supabase } from "../superbase-client";
 
 export const getStoredGoogleTokens = () => {

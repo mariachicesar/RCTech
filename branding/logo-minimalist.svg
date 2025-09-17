@@ -1,0 +1,10 @@
+<svg width="280" height="120" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- RC in large letters -->
+  <text x="100" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#CD7F32">RC</text>
+  
+  <!-- Bridge line connecting letters -->
+  <rect x="90" y="45" width="80" height="3" fill="#C41E3A"/>
+  
+  <!-- Tech Bridge text -->
+  <text x="140" y="85" font-family="Arial, sans-serif" font-size="12" font-weight="normal" fill="#8B4513" text-anchor="middle">TECH BRIDGE</text>
+</svg>

@@ -34,8 +34,8 @@ export default function AuthCallbackHandler() {
             console.log('Google refresh token saved in callback');
           }
 
-          // Redirect to dashboard
-          router.push('/');
+          // Redirect to admin dashboard
+          router.push('/admin');
         } else {
           console.log('No session found in callback');
           router.push('/signin');
