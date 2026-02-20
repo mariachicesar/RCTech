@@ -7,6 +7,7 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { Database } from "../../../database.types";
 import { mutateUpdate } from "../../hooks/useMutateUpdate";
+import { getApiBaseUrl } from "@/lib/api";
 
 // Define the type for the user table in the Database
 type User = Database["public"]["Tables"]["user"]["Row"];
@@ -29,7 +30,7 @@ export default function UserInfoCard({ user }: { user: User | null }) {
       path: user?.id ? `/user?id=eq.${user?.id}` : null,
       method: "PATCH",
       payload: updatedUser,
-      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${user?.id}`,
+      mutateKey: `${getApiBaseUrl()}/users/${user?.id}`,
     });
 
     if (updateResult.error) {

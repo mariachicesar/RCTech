@@ -122,7 +122,12 @@ export const usePageManager = ({ websiteId, onSuccess }: UsePageManagerProps) =>
     });
 
     if (result) {
-      const pageId = (result.response as { id: number }[])[0].id;
+      const responseData = result.response as { id: number } | { id: number }[];
+      const pageId = Array.isArray(responseData) ? responseData[0]?.id : responseData?.id;
+
+      if (!pageId) {
+        return null;
+      }
       
       await mutateUpdate({
         path: "/seo_metadata",

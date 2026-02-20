@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import { UserTable } from "./useSearchUser";
+import { getApiBaseUrl } from "@/lib/api";
 
 export const useUser = (userId: number | null) => {
-    const res = useSWR<UserTable | null>(userId ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${userId}` : null, {
+    const res = useSWR<UserTable | null>(userId ? `${getApiBaseUrl()}/users/${userId}` : null, {
         revalidateOnFocus: false,
         shouldRetryOnError: false,
     });
