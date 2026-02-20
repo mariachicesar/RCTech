@@ -9,6 +9,7 @@ import { useBusinessByWebsiteId } from "../../hooks/useBusinessByWebsiteId";
 import { mutateUpdate } from "../../hooks/useMutateUpdate";
 import { useSidebar } from "../../context/SidebarContext";
 import { mutate } from "swr";
+import { getApiBaseUrl } from "@/lib/api";
 
 
 export default function UserBusinessCard() {
@@ -76,7 +77,14 @@ export default function UserBusinessCard() {
         console.error("Error saving user data:", result.error);
         return
       }
-      const websiteId: number = (result.response as { id: number }[])[0].id;
+      const websiteResponse = result.response as { id: number } | { id: number }[];
+      const websiteId: number | undefined = Array.isArray(websiteResponse) ? websiteResponse[0]?.id : websiteResponse?.id;
+
+      if (!websiteId) {
+        console.error("Website creation did not return an id");
+        return;
+      }
+
       mutateUpdate({
         path: `/user?id=eq.${selectedClient?.id}`,
         method: "PATCH",
@@ -87,7 +95,7 @@ export default function UserBusinessCard() {
       mutateUpdate({
         path: `/business_listing`,
         method: "POST",
-        mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${selectedClient?.website_id}`,
+        mutateKey: `${getApiBaseUrl()}/business-listings?website_id=${websiteId}`,
         payload: {
           business_name: formData.name,
           address: formData.address,
@@ -104,7 +112,7 @@ export default function UserBusinessCard() {
     mutateUpdate({
       path: `/business_listing?website_id=eq.${selectedClient?.website_id}`,
       method: "PATCH",
-      mutateKey: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${selectedClient?.website_id}`,
+      mutateKey: `${getApiBaseUrl()}/business-listings?website_id=${selectedClient?.website_id}`,
       payload: {
         business_name: formData.name,
         address: formData.address,
@@ -117,7 +125,7 @@ export default function UserBusinessCard() {
       },
     });
   }
-    mutate(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/user?id=eq.${selectedClient?.id}`);
+    mutate(`${getApiBaseUrl()}/users/${selectedClient?.id}`);
     closeModal();
   };
   return (

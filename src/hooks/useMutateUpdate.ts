@@ -1,5 +1,6 @@
 import { mutate } from 'swr';
 import { fetcher } from './fetcher';
+import { toApiUrl, methodToBackendMethod } from '@/lib/api';
 
 // Define the type for the user table in the Database
 type UpdateType = {
@@ -17,15 +18,52 @@ type UseMutateUpdateResponse = {
 };
 
 export async function mutateUpdate({ path, method, mutateKey, payload, additionalHeaders }: UpdateType): Promise<UseMutateUpdateResponse> {
-    const fullPath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1${path}`;
+    if (!path) {
+        return { response: null, error: 'Path is required' };
+    }
+
+    let fullPath = toApiUrl(path);
+    const normalizedMethod = methodToBackendMethod(method);
+
+    if (normalizedMethod === 'PUT') {
+        const pathUrl = new URL(fullPath);
+
+        if (pathUrl.pathname.endsWith('/users')) {
+            const userId = pathUrl.searchParams.get('id');
+            if (userId?.startsWith('eq.')) {
+                fullPath = `${pathUrl.origin}${pathUrl.pathname}/${userId.replace('eq.', '')}`;
+            }
+        }
+
+        if (pathUrl.pathname.endsWith('/business-listings')) {
+            const businessId = pathUrl.searchParams.get('id');
+            const websiteId = pathUrl.searchParams.get('website_id');
+
+            if (businessId?.startsWith('eq.')) {
+                fullPath = `${pathUrl.origin}${pathUrl.pathname}/${businessId.replace('eq.', '')}`;
+            } else if (websiteId) {
+                const websiteResponse = await fetcher<Array<{ id: number }>>(
+                    `${pathUrl.origin}${pathUrl.pathname}?website_id=${websiteId.replace('eq.', '')}`,
+                    'GET'
+                );
+
+                if (!websiteResponse || websiteResponse.length === 0) {
+                    return { response: null, error: 'Business listing not found for website' };
+                }
+
+                fullPath = `${pathUrl.origin}${pathUrl.pathname}/${websiteResponse[0].id}`;
+            }
+        }
+    }
+
     console.log('mutateUpdate - Full URL:', fullPath);
-    console.log('mutateUpdate - Method:', method);
+    console.log('mutateUpdate - Method:', normalizedMethod);
     console.log('mutateUpdate - Payload:', payload);
     
     try {
-        const res = await fetcher(fullPath, method, process.env.NEXT_PUBLIC_SUPABASE_KEY as string, payload, additionalHeaders);
+        const res = await fetcher(fullPath, normalizedMethod, undefined, payload, additionalHeaders);
         if (mutateKey) {
-            void mutate(mutateKey);
+            void mutate(toApiUrl(mutateKey));
         }
         console.log('mutateUpdate - Success response:', res);
         return { response: res, error: null };

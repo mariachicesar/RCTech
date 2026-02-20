@@ -1,5 +1,6 @@
 import { Database } from './../../database.types';
 import useSWR, { SWRResponse } from "swr";
+import { getApiBaseUrl } from '@/lib/api';
 
 // Define the type for the user table in the Database
 export type UserTable = Database["public"]["Tables"]["user"]["Row"];
@@ -15,7 +16,7 @@ export const useSearchUser = (searchValue: string): UseSearchUserResponse => {
     // Fetch user data based on the search value
     const swrResponse: SWRResponse<UserTable[], Error> = useSWR(
         searchValue
-            ? `https://ghojojqkptplppuiikqm.supabase.co/rest/v1/user?email=like.${searchValue}*&select=*`
+            ? `${getApiBaseUrl()}/users?email_like=${encodeURIComponent(searchValue)}`
             : null,
         {
             revalidateOnFocus: false,

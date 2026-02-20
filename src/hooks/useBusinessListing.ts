@@ -1,9 +1,10 @@
 import useSWR, { SWRResponse } from "swr";
+import { getApiBaseUrl } from "@/lib/api";
 
 
 export const useGetBusinessByWebsiteId = (websiteId: number | null) => {
     const res: SWRResponse = useSWR(
-        websiteId ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${websiteId}&select=*` : null,
+        websiteId ? `${getApiBaseUrl()}/business-listings?website_id=${websiteId}` : null,
         {
             revalidateOnFocus: false,
         }

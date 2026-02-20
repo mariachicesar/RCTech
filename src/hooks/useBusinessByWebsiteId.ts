@@ -1,5 +1,6 @@
 import useSWR, { SWRResponse } from "swr";
 import { Database } from "../../database.types";
+import { getApiBaseUrl } from "@/lib/api";
 
 /**
  * Represents a single row in the `business_listing` table.
@@ -12,7 +13,7 @@ export const useBusinessByWebsiteId = (websiteId: number | null): {
     error: Error | undefined;
 } => {
     const res: SWRResponse = useSWR(
-        websiteId ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/business_listing?website_id=eq.${websiteId}` : null,
+        websiteId ? `${getApiBaseUrl()}/business-listings?website_id=${websiteId}` : null,
         {
             revalidateOnFocus: false,
         }

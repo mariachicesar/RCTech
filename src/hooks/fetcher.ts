@@ -1,29 +1,26 @@
+import { toApiUrl, methodToBackendMethod } from "@/lib/api";
+
 export const fetcher = async <T>(
   url: string,
-  method: string,
-  token: string,
+  method: string = "GET",
+  token?: string,
   payload?: T,
   additionalHeaders?: Record<string, string>,
 ) => {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_KEY) {
-    console.error(
-      "Supabase Key is missing. Please set NEXT_PUBLIC_SUPABASE_KEY in your environment variables.",
-    );
-    throw new Error("Supabase Key is missing");
-  }
+  const resolvedUrl = toApiUrl(url);
+  const resolvedMethod = methodToBackendMethod(method);
 
-  console.log('Fetcher - Making request to:', url);
+  console.log('Fetcher - Making request to:', resolvedUrl);
   console.log('Fetcher - Method:', method);
   console.log('Fetcher - Payload:', payload);
 
-  const res = await fetch(url, {
-    method: method,
+  const res = await fetch(resolvedUrl, {
+    method: resolvedMethod,
     headers: {
-      apikey: process.env.NEXT_PUBLIC_SUPABASE_KEY,
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_KEY}`,
       "Content-Type": "application/json",
       ...additionalHeaders, // Spread any additional headers passed in
     },
+    credentials: 'include',
     body: payload ? JSON.stringify(payload) : null,
   });
 
@@ -35,8 +32,8 @@ export const fetcher = async <T>(
     console.error('Fetch error:', {
       status: res.status,
       statusText: res.statusText,
-      url: url,
-      method: method,
+      url: resolvedUrl,
+      method: resolvedMethod,
       errorText: errorText
     });
     throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);

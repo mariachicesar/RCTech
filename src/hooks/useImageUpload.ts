@@ -112,17 +112,7 @@ export const useImageUpload = () => {
    */
   const getLastPageId = useCallback(async (websiteId?: number) => {
     try {
-      const queryParams = new URLSearchParams({
-        select: 'id',
-        order: 'id.desc',
-        limit: '1'
-      });
-
-      if (websiteId) {
-        queryParams.append('website_id', `eq.${websiteId}`);
-      }
-
-      const path = `/page?${queryParams.toString()}`;
+      const path = websiteId ? `/page?website_id=${websiteId}` : '/page';
 
       const response = await mutateUpdate({
         path,

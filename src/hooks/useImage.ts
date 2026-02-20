@@ -1,6 +1,6 @@
 import useSWR, { SWRResponse } from "swr";
 import { Database } from "../../database.types";
-import { fetcher } from "./fetcher";
+import { getApiBaseUrl } from "@/lib/api";
 
 export type Image = Database["public"]["Tables"]["image"]["Row"];
 export type Asset = Database["public"]["Tables"]["asset"]["Row"] & {
@@ -16,12 +16,8 @@ export const useGetAssets = (
     isLoading: boolean;
     error: Error | undefined;
 } => {
-    const rangeStart = page * pageSize;
-    const rangeEnd = rangeStart + pageSize - 1;
-    
     const res: SWRResponse = useSWR(
-        websiteId ? [`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/asset?website_id=eq.${websiteId}&select=*,image(*)`] : null,
-        ([url]) => fetcher(url, "GET", process.env.NEXT_PUBLIC_SUPABASE_KEY as string, undefined,  { Range: `${rangeStart}-${rangeEnd}` } ),
+        websiteId ? `${getApiBaseUrl()}/assets?website_id=${websiteId}&page=${page}&page_size=${pageSize}` : null,
         {
             revalidateOnFocus: false,
         }
