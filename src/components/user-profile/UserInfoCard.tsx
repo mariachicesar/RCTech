@@ -15,9 +15,23 @@ type User = Database["public"]["Tables"]["user"]["Row"];
 export default function UserInfoCard({ user }: { user: User | null }) {
   // Modal state
   const { isOpen, openModal, closeModal } = useModal();
+  const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    setIsLoading(true);
+
+    if (!user?.id) {
+      setError("User ID is not available. Please refresh the page and try again.");
+      setIsLoading(false);
+      console.error("User ID missing:", user);
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     const updatedUser = {
       name: formData.get("name") as string,
@@ -25,19 +39,32 @@ export default function UserInfoCard({ user }: { user: User | null }) {
       phone: formData.get("phone") as string,
     };
 
-    // Call mutateUpdate and handle the response
-    const updateResult = await mutateUpdate({
-      path: user?.id ? `/users/${user?.id}` : null,
-      method: "PATCH",
-      payload: updatedUser,
-      mutateKey: `${getApiBaseUrl()}/users/${user?.id}`,
-    });
+    try {
+      // Call mutateUpdate and handle the response
+      const updateResult = await mutateUpdate({
+        path: `/users/${user.id}`,
+        method: "PATCH",
+        payload: updatedUser,
+        mutateKey: `${getApiBaseUrl()}/users/${user.id}`,
+      });
 
-    if (updateResult.error) {
-      console.error("Error details:", updateResult.error);
-    } else {
-      console.log("User updated successfully:", updateResult.response);
-      closeModal();
+      if (updateResult.error) {
+        console.error("Error details:", updateResult.error);
+        setError(updateResult.error as string || "Failed to update user");
+      } else {
+        console.log("User updated successfully:", updateResult.response);
+        setSuccess(true);
+        setTimeout(() => {
+          closeModal();
+          setSuccess(false);
+        }, 1500);
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred";
+      console.error("Update error:", err);
+      setError(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -129,6 +156,16 @@ export default function UserInfoCard({ user }: { user: User | null }) {
           </div>
           <form className="flex flex-col" onSubmit={handleSave}>
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
+              {error && (
+                <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="mb-4 p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                  ✓ User updated successfully!
+                </div>
+              )}
               <div className="mt-7">
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Personal Information
@@ -165,11 +202,11 @@ export default function UserInfoCard({ user }: { user: User | null }) {
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={closeModal}>
+              <Button size="sm" variant="outline" onClick={closeModal} disabled={isLoading}>
                 Close
               </Button>
-              <Button size="sm" type="submit">
-                Save Changes
+              <Button size="sm" type="submit" disabled={isLoading || !user?.id}>
+                {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

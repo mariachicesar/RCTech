@@ -23,9 +23,13 @@ export default function AdminLayout({
   const [session, setSession] = useState<any>(null)
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchSession = async () => {
       try {
         const user = await apiClient.getSession()
+        if (!isMounted) return;
+        
         if (!user) {
           router.push('/signin')
           return
@@ -33,14 +37,18 @@ export default function AdminLayout({
         setSession(user)
         setActiveUser(user || null)
       } catch (error) {
-        console.error('Failed to fetch session:', error)
-        router.push('/signin')
+        if (isMounted) {
+          console.error('Failed to fetch session:', error)
+          router.push('/signin')
+        }
       }
     }
 
     fetchSession()
-    // Only run once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
+    return () => {
+      isMounted = false;
+    }
   }, [])
 
   // Dynamic class for main content margin based on sidebar state
@@ -54,7 +62,12 @@ export default function AdminLayout({
     <div className="min-h-screen xl:flex">
       {session ? (
         <SWRConfig
-          value={{ fetcher }}
+          value={{ 
+            fetcher,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: true,
+            dedupingInterval: 60000,
+          }}
         >
           {/* Sidebar and Backdrop */}
           <AppSidebar />

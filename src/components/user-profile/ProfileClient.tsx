@@ -13,7 +13,7 @@ import { apiClient } from "@/lib/api-client";
 
 const ProfileClient: React.FC = () => {
     // Context
-    const { selectedClient } = useSidebar();
+    const { user, selectedClient } = useSidebar();
 
     // State to manage new user creation form visibility
     const [isNewUser, setIsNewUser] = useState(false);
@@ -105,7 +105,7 @@ const ProfileClient: React.FC = () => {
             </Modal>
             <div className="space-y-6">
                 <UserMetaCard />
-                <UserInfoCard user={selectedClient} />
+                <UserInfoCard user={user} />
                 <UserBusinessCard />
             </div>
         </div>
