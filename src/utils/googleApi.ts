@@ -39,44 +39,21 @@ export const getGoogleUserProfile = async () => {
   return makeGoogleApiRequest('https://www.googleapis.com/oauth2/v2/userinfo');
 };
 
-export async function createGoogleBusinessPost(locationId: string, postData: any, clientId: number) {
+export async function createGoogleBusinessPost(locationId: string, postData: any, _clientId?: number) {
     try {
-        const clientIdInt = parseInt(clientId.toString());
-        if (isNaN(clientIdInt)) {
-            throw new Error('Invalid clientId format');
-        }
-
-        let accessToken = localStorage.getItem('google_access_token');
-        
-        if (!accessToken) {
-            console.warn('No access token, creating mock post');
-            return createMockResponse(locationId, postData, 'NO_TOKEN');
-        }
-
-        if (isTokenExpired(accessToken)) {
-            accessToken = await refreshGoogleToken();
-            
-            if (!accessToken) {
-                console.warn('Failed to refresh token, creating mock post');
-                return createMockResponse(locationId, postData, 'TOKEN_REFRESH_FAILED');
-            }
-        }
-
-        const gmb_response = await callGoogleMyBusinessAPI(locationId, postData, accessToken);
-        
-        const savedPost = await apiClient.post('/gmb-posts', {
-            location_id: locationId,
-            gmb_post_id: gmb_response.name,
-            post_data: postData,
-            status: "published"
+        const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+        const response = await fetch(`${apiUrl}/google/post`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ locationId, postData }),
         });
 
-        return {
-            success: true,
-            message: gmb_response._mockReason ? 'Post saved to database (API not enabled)' : 'Post created successfully on Google Business Profile',
-            gmb_response,
-            saved_post: savedPost
-        };
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => null);
+            throw new Error(errBody?.error || `Post failed with status ${response.status}`);
+        }
+
+        return response.json();
     } catch (error) {
         console.error('Error in createGoogleBusinessPost:', error);
         throw error;
